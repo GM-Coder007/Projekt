@@ -1,0 +1,11 @@
+[{
+  "_id": {
+    "$oid": "6279710348ed3f604f9f6a95"
+  },
+  "zemljepisna_sirina": 23.23232,
+  "zemljepisna_dolzina": 34.23264,
+  "cas": "23:10",
+  "id_voznje": {
+    "$oid": "62796f0448ed3f604f9f6a92"
+  }
+}]

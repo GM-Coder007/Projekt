@@ -1,0 +1,8 @@
+[{
+  "_id": {
+    "$oid": "62796f0448ed3f604f9f6a92"
+  },
+  "datum_voznje": "12.5.2022",
+  "cas_zacetka": "20:00",
+  "cas_konca": "21:00"
+}]
