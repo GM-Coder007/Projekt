@@ -5,6 +5,10 @@
   "uporabnisko_ime": "test",
   "email": "blabla.bla@gmail.com",
   "geslo": "$2b$10$5/NjYbDpWlUB3MRy0VxoSugJAa389ESM.DOpubkmJINqCVKYwLsqm",
-  "datum_registracije": "22.4.2022",
+  "datum_registracije": {
+    "$date": {
+      "$numberLong": "1670194800000"
+    }
+  },
   "slika": "slika.png"
 }]
