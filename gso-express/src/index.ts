@@ -5,8 +5,9 @@ import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
-import userRoutes from "./routes/userRoutes";
 import StatusCodes from "http-status-codes";
+import userRoutes from "./routes/userRoutes";
+import dataRoutes from "./routes/dataRoutes";
 
 dotenv.config();
 
@@ -38,7 +39,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const { NOT_FOUND } = StatusCodes;
 
-app.use("/users", userRoutes);
+app.use("/user", userRoutes);
+app.use("/data", dataRoutes);
 
 app.use(function (req: Request, res: Response) {
   res.status(NOT_FOUND).json({ msg: "Not found" });

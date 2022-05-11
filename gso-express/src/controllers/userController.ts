@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
 import { HydratedDocument, CallbackError } from "mongoose";
-import bcrypt from "bcrypt";
 import User, { IUser } from "../models/userModel";
 
 const {
@@ -70,7 +69,7 @@ async function register(req: Request, res: Response) {
   });
 }
 
-function list(req: Request, res: Response) {
+/*function list(req: Request, res: Response) {
   User.find(function (err: CallbackError, users: HydratedDocument<IUser>) {
     if (err) {
       return res.status(INTERNAL_SERVER_ERROR).json({
@@ -189,4 +188,10 @@ export default {
   create,
   update,
   remove,
+} as const;
+*/
+
+export default {
+  login,
+  register,
 } as const;
