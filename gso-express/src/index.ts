@@ -8,6 +8,7 @@ import path from "path";
 import StatusCodes from "http-status-codes";
 import userRoutes from "./routes/userRoutes";
 import dataRoutes from "./routes/dataRoutes";
+import voznjaRoutes from "./routes/voznjaRoutes";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ const { NOT_FOUND } = StatusCodes;
 
 app.use("/user", userRoutes);
 app.use("/data", dataRoutes);
+app.use('/voznja', voznjaRoutes);
 
 app.use(function (req: Request, res: Response) {
   res.status(NOT_FOUND).json({ msg: "Not found" });
