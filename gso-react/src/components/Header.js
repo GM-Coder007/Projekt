@@ -14,6 +14,7 @@ function Header(props) {
                             context.user ?
                                 <>
                                     <li><Link to='/ustvariVoznjo'>Ustvari vožnjo</Link></li>
+                                    <li><Link to='/vseVoznje'>Vse vožnje</Link></li>
                                     <li><Link to='/logout'>Odjava</Link></li>
                                 </>
                             :
