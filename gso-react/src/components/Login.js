@@ -23,7 +23,7 @@ function Login(){
         if(data._id !== undefined){
             userContext.setUserContext(data);
         } else {
-            setUsername("");
+            setEmail("");
             setPassword("");
             setError("Invalid email or password");
         }
