@@ -8,15 +8,17 @@ import path from "path";
 import StatusCodes from "http-status-codes";
 import userRoutes from "./routes/userRoutes";
 import dataRoutes from "./routes/dataRoutes";
-import voznjaRoutes from "./routes/voznjaRoutes";
+//import voznjaRoutes from "./routes/voznjaRoutes";
 
 dotenv.config();
 
-var mongoDB = "mongodb://localhost/projekt";
+const port = process.env.PORT || 3000;
+const mongoDB = process.env.MONGO_STRING || "mongodb://localhost/projekt";
+
+//var mongoDB = "mongodb://localhost/projekt";
 mongoose.connect(mongoDB);
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
 
 declare module "express-session" {
   interface SessionData {
@@ -42,7 +44,7 @@ const { NOT_FOUND } = StatusCodes;
 
 app.use("/user", userRoutes);
 app.use("/data", dataRoutes);
-app.use('/voznja', voznjaRoutes);
+//app.use('/voznja', voznjaRoutes);
 
 app.use(function (req: Request, res: Response) {
   res.status(NOT_FOUND).json({ msg: "Not found" });

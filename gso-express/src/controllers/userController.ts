@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
 import { HydratedDocument, CallbackError } from "mongoose";
 import User, { IUser } from "../models/userModel";
+import { body, validationResult } from "express-validator";
 
 const {
   OK,
@@ -14,6 +15,13 @@ const {
 } = StatusCodes;
 
 async function login(req: Request, res: Response) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ msg: "Bad input info", errors: errors.array() });
+  }
+
   const email: string = req.body.email;
   const password: string = req.body.password;
 
@@ -39,6 +47,13 @@ async function login(req: Request, res: Response) {
 }
 
 async function register(req: Request, res: Response) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(400)
+      .json({ msg: "Bad input info", errors: errors.array() });
+  }
+
   const email: string = req.body.email;
   const password: string = req.body.password;
 

@@ -1,9 +1,15 @@
 import { Request, Response, Router } from "express";
 import userController from "../controllers/userController";
+import { body, validationResult } from "express-validator";
 
 const router = Router();
 
-router.post("/login", userController.login);
+router.post(
+  "/login",
+  body("username").not().isEmpty().trim().escape(),
+  body("password").not().isEmpty(),
+  userController.login
+);
 router.post("/register", userController.register);
 
 /*router.get("/", userController.list);
