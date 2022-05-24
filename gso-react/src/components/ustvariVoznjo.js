@@ -6,7 +6,7 @@ function UstvariVoznjo(props) {
     const userContext = useContext(UserContext); 
     const[datum_voznje, setDatum_voznje] = useState('');
     const[cas_zacetka, setCas_zacetka] = useState('');
-    const[cas_konca, setCas_konca] = useState(false);
+    const[cas_konca, setCas_konca] = useState('');
     const[uploaded, setUploaded] = useState(false);
 
     async function onSubmit(e){
@@ -44,9 +44,12 @@ function UstvariVoznjo(props) {
     return (
         <form className="form-group" onSubmit={onSubmit}>
             {!userContext.user ? <Navigate replace to="/login" /> : ""}
-            {uploaded ? <Navigate replace to="/" /> : ""}          
+            {uploaded ? <Navigate replace to="/" /> : ""} 
+            <label><b>Datum vožnje: </b></label> <br />       
             <input type="date" class="form-control" name="datum_voznje" placeholder="Datum vožnje" value={datum_voznje} onChange={(e)=>{setDatum_voznje(e.target.value)}}/>  <br />
+            <label><b>Čas začetka: </b></label> <br /> 
             <input type="text" class="form-control" name="cas_zacetka" placeholder="Čas začetka" value={cas_zacetka} onChange={(e)=>{setCas_zacetka(e.target.value)}}/>  <br />
+            <label><b>Čas konca: </b></label> <br /> 
             <input type="text" class="form-control" name="cas_konca" placeholder="Čas konca" value={cas_konca} onChange={(e)=>{setCas_konca(e.target.value)}}/>  <br />
             <input className="btn btn-primary" type="submit" name="submit" value="Potrdi" />
         </form>
@@ -54,5 +57,6 @@ function UstvariVoznjo(props) {
 }
 
 export default UstvariVoznjo;
+
 
 
