@@ -5,7 +5,7 @@ import Header from "./components/Header";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Logout from "./components/Logout";
-import ustvariVoznjo from "./components/ustvariVoznjo";
+import UstvariVoznjo from "./components/ustvariVoznjo";
 
 
 function App() {
@@ -49,7 +49,7 @@ function App() {
             <Route path="/login" exact element={<Login />}></Route>
             <Route path="/register" element={<Register />}></Route>
             <Route path="/logout" element={<Logout />}></Route>
-            <Route path="/ustvariVoznjo" element={<ustvariVoznjo />}></Route>
+            <Route path="/ustvariVoznjo" element={<UstvariVoznjo />}></Route>
           </Routes>
         </div>
       </UserContext.Provider>
@@ -58,3 +58,4 @@ function App() {
 }
 
 export default App;
+
