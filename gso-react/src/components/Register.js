@@ -22,7 +22,6 @@ function Register() {
             window.location.href="/login";
         }
         else{
-            setUsername("");
             setPassword("");
             setEmail("");
             setError("Registration failed");
