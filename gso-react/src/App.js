@@ -10,6 +10,7 @@ import Voznja from "./components/Voznja";
 import VseVoznje from "./components/Voznje";
 import Hitrost from "./components/Hitrost";
 import Hitrosti from "./components/Hitrosti";
+import VoznjaDescription from "./components/VoznjaDescription";
 
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
             <Route path="/vseVoznje" element={<VseVoznje />}></Route>
             <Route path="/Hitrosti" element={<Hitrosti />}></Route>
             <Route path="/Hitrost" element={<Hitrost />}></Route>
+            <Route path="/enaVoznja/:voznjaID" element={<VoznjaDescription />}></Route>
           </Routes>
         </div>
       </UserContext.Provider>
@@ -65,3 +67,4 @@ function App() {
 }
 
 export default App;
+
