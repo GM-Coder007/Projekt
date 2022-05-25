@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import cors from "cors";
 import mongoose from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
@@ -19,6 +20,23 @@ const mongoDB = process.env.MONGO_STRING || "mongodb://localhost/projekt";
 mongoose.connect(mongoDB);
 
 const app: Express = express();
+
+const allowedOrigins = ["http://localhost:3000", "http://localhost:4000"];
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 declare module "express-session" {
   interface SessionData {

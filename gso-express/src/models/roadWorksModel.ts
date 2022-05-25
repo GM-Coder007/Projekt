@@ -11,7 +11,17 @@ export interface IRoadWorks {
 
 const roadWorksSchema = new Schema<IRoadWorks>(
   {
-    location: { type: Schema.Types.Point, required: true },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     type: { type: String, required: true },
     description: { type: String },
   },

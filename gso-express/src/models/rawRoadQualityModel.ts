@@ -12,8 +12,28 @@ export interface IRawRoadQuality {
 
 const rawRoadQualitySchema = new Schema<IRawRoadQuality>(
   {
-    start: { type: Schema.Types.Point, required: true },
-    end: { type: Schema.Types.Point, required: true },
+    start: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
+    end: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     measurements: { type: [[Number, Number, Number]], required: true },
     speed: { type: Number, required: true },
   },

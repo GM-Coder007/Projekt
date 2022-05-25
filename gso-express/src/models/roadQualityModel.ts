@@ -11,8 +11,28 @@ export interface IRoadQuality {
 
 const roadQualitySchema = new Schema<IRoadQuality>(
   {
-    start: { type: Schema.Types.Point, required: true },
-    end: { type: Schema.Types.Point, required: true },
+    start: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
+    end: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
     quality: { type: Number, required: true },
   },
   { timestamps: true }
