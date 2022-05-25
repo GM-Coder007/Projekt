@@ -9,7 +9,7 @@ function Hitrost(props){
 
               <h5><b>ID vožnje:</b></h5><h5 className="card-title"><strong>{props.hitrost.id_voznje}</strong></h5>
 
-                <Link to={`/enaVoznja/${props.hitrost._id}`}><b>Preglej</b></Link>
+             //   <Link to={`/enaVoznja/${props.hitrost._id}`}><b>Preglej</b></Link>
 
 
         </div>
