@@ -10,7 +10,7 @@ function Voznja(props){
 
               <h5><b>Čas konca:</b></h5><h5 className="card-title"><strong>{props.voznja.cas_konca}</strong></h5>
 
-          //  <Link to={`/singlePhoto/${props.voznja._id}`}><b>Preglej</b></Link>
+              <Link to={`/enaVoznja/${props.voznja._id}`}><b>Preglej</b></Link>
 
 
         </div>
