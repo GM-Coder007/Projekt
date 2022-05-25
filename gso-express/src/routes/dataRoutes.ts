@@ -3,6 +3,9 @@ import dataController from "../controllers/dataController";
 
 const router = Router();
 
+router.get("/drives", dataController.driveGet);
+router.post("/drives", dataController.drivePost);
+
 router.get("/roadquality", dataController.roadqualityGet);
 router.post("/roadquality", dataController.roadqualityPost);
 

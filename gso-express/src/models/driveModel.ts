@@ -1,7 +1,7 @@
 import { Point } from "geojson";
 import { Schema, model, Date } from "mongoose";
 
-export interface IRoadQuality {
+export interface IDrive {
   start?: Point;
   end?: Point;
   averageSpeed?: number;
@@ -10,16 +10,36 @@ export interface IRoadQuality {
   updatedAt: Date;
 }
 
-const roadQualitySchema = new Schema<IRoadQuality>(
+const driveSchema = new Schema<IDrive>(
   {
-    start: { type: Schema.Types.Point },
-    end: { type: Schema.Types.Point },
-    averageSpeed: Number,
-    maxSpeed: Number,
+    start: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
+    end: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
+    },
+    averageSpeed: { type: Number },
+    maxSpeed: { type: Number },
   },
   { timestamps: true }
 );
 
-const RoadQuality = model<IRoadQuality>("RoadQuality", roadQualitySchema);
+const Drive = model<IDrive>("Drive", driveSchema);
 
-export default RoadQuality;
+export default Drive;
