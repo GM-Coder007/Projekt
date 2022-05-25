@@ -12,6 +12,7 @@ export interface IUser {
   email: string;
   password: string;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 interface UserModel extends Model<IUser> {
@@ -22,14 +23,13 @@ interface UserModel extends Model<IUser> {
   ): void;
 }
 
-const userSchema = new Schema<IUser>({
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-  createdAt: {
-    type: Date,
-    default: () => Date.now(),
+const userSchema = new Schema<IUser>(
+  {
+    email: { type: String, required: true },
+    password: { type: String, required: true },
   },
-});
+  { timestamps: true }
+);
 
 userSchema.static(
   "authenticate",

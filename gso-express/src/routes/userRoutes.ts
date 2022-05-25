@@ -6,11 +6,16 @@ const router = Router();
 
 router.post(
   "/login",
-  body("username").not().isEmpty().trim().escape(),
-  body("password").not().isEmpty(),
+  body("email").isEmail().normalizeEmail(),
+  body("password").isString().not().isEmpty(),
   userController.login
 );
-router.post("/register", userController.register);
+router.post(
+  "/register",
+  body("email").isEmail().normalizeEmail(),
+  body("password").isString().not().isEmpty(),
+  userController.register
+);
 
 /*router.get("/", userController.list);
 router.get("/:id", userController.show);

@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const { NOT_FOUND } = StatusCodes;
 
-app.use("/user", userRoutes);
+app.use("/users", userRoutes);
 app.use("/data", dataRoutes);
 //app.use('/voznja', voznjaRoutes);
 

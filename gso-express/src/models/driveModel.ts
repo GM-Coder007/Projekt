@@ -2,18 +2,20 @@ import { Point } from "geojson";
 import { Schema, model, Date } from "mongoose";
 
 export interface IRoadQuality {
-  start: Point;
-  end: Point;
-  quality: number;
+  start?: Point;
+  end?: Point;
+  averageSpeed?: number;
+  maxSpeed?: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const roadQualitySchema = new Schema<IRoadQuality>(
   {
-    start: { type: Schema.Types.Point, required: true },
-    end: { type: Schema.Types.Point, required: true },
-    quality: { type: Number, required: true },
+    start: { type: Schema.Types.Point },
+    end: { type: Schema.Types.Point },
+    averageSpeed: Number,
+    maxSpeed: Number,
   },
   { timestamps: true }
 );

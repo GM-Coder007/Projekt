@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
 import { HydratedDocument, CallbackError } from "mongoose";
 import RoadQuality, { IRoadQuality } from "../models/roadQualityModel";
+import RawRoadQuality, { IRawRoadQuality } from "../models/rawRoadQualityModel";
 import RoadWorks, { IRoadWorks } from "../models/roadWorksModel";
+import { Point } from "geojson";
 
 const {
   OK,
@@ -15,10 +17,7 @@ const {
 } = StatusCodes;
 
 function roadqualityGet(req: Request, res: Response) {
-  RoadQuality.find(function (
-    err: CallbackError,
-    roadquality: HydratedDocument<IRoadQuality>
-  ) {
+  RoadQuality.find(function (err, roadquality) {
     if (err) {
       return res.status(INTERNAL_SERVER_ERROR).json({
         msg: "Server error.",
@@ -30,11 +29,40 @@ function roadqualityGet(req: Request, res: Response) {
 }
 
 function roadqualityPost(req: Request, res: Response) {
-  const long: number = req.body.long;
-  const lat: number = req.body.lat;
+  const start: Point = req.body.start;
+  const end: Point = req.body.end;
   const quality: number = req.body.quality;
 
-  var roadQuality = new RoadQuality({ long, lat, quality });
+  var roadQuality = new RoadQuality({ start, end, quality });
+
+  roadQuality.save(function (err, roadquality) {
+    if (err) {
+      return res.status(INTERNAL_SERVER_ERROR).json({
+        msg: "Server error.",
+      });
+    }
+    return res.status(CREATED).json(roadquality);
+  });
+}
+
+function rawroadqualityGet(req: Request, res: Response) {
+  RawRoadQuality.find(function (err, roadquality) {
+    if (err) {
+      return res.status(INTERNAL_SERVER_ERROR).json({
+        msg: "Server error.",
+      });
+    }
+
+    return res.json(roadquality);
+  });
+}
+
+function rawroadqualityPost(req: Request, res: Response) {
+  const start: Point = req.body.start;
+  const end: Point = req.body.end;
+  const measurements: [[number, number, number]] = req.body.measurements;
+  const speed: number = req.body.speed;
+  var roadQuality = new RawRoadQuality({ start, end, measurements, speed });
 
   roadQuality.save(function (err, roadquality) {
     if (err) {
@@ -47,10 +75,7 @@ function roadqualityPost(req: Request, res: Response) {
 }
 
 function roadworksGet(req: Request, res: Response) {
-  RoadWorks.find(function (
-    err: CallbackError,
-    roadWorks: HydratedDocument<IRoadWorks>
-  ) {
+  RoadWorks.find(function (err, roadWorks) {
     if (err) {
       return res.status(INTERNAL_SERVER_ERROR).json({
         msg: "Server error.",
@@ -62,12 +87,11 @@ function roadworksGet(req: Request, res: Response) {
 }
 
 function roadworksPost(req: Request, res: Response) {
-  const long: number = req.body.long;
-  const lat: number = req.body.lat;
+  const location: Point = req.body.location;
   const type: string = req.body.type;
   const description: string = req.body.description;
 
-  var roadWorks = new RoadWorks({ long, lat, type, description });
+  var roadWorks = new RoadWorks({ location, type, description });
 
   roadWorks.save(function (err, roadworks) {
     if (err) {
@@ -82,6 +106,8 @@ function roadworksPost(req: Request, res: Response) {
 export default {
   roadqualityGet,
   roadqualityPost,
+  rawroadqualityGet,
+  rawroadqualityPost,
   roadworksGet,
   roadworksPost,
 } as const;
