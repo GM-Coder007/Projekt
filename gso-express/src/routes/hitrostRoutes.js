@@ -7,7 +7,7 @@ router.get('/', hitrostController.list); // vse hitrosti vseh voženj
 
 router.get('/:id', hitrostController.show); // ena hitrost
 
-router.get('/vseHitrosti/:id', hitrostController.showHitrosti); // vse hitrosti ene vožnje
+router.get('/mojeHitrosti/:id', hitrostController.showHitrosti); // vse hitrosti ene vožnje
 
 
 module.exports = router;
