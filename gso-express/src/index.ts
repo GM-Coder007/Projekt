@@ -9,7 +9,8 @@ import path from "path";
 import StatusCodes from "http-status-codes";
 import userRoutes from "./routes/userRoutes";
 import dataRoutes from "./routes/dataRoutes";
-//import voznjaRoutes from "./routes/voznjaRoutes";
+import voznjaRoutes from "./routes/voznjaRoutes";
+import hitrostRoutes from "./routes/hitrostRoutes";
 
 dotenv.config();
 
@@ -62,7 +63,8 @@ const { NOT_FOUND } = StatusCodes;
 
 app.use("/users", userRoutes);
 app.use("/data", dataRoutes);
-//app.use('/voznja', voznjaRoutes);
+app.use('/voznja', voznjaRoutes);
+app.use('/hitrost', hitrostRoutes);
 
 app.use(function (req: Request, res: Response) {
   res.status(NOT_FOUND).json({ msg: "Not found" });
