@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
-import { HydratedDocument, CallbackError } from "mongoose";
-import User, { IUser } from "../models/userModel";
-import { body, validationResult } from "express-validator";
+import User from "../models/userModel";
+import { validationResult } from "express-validator";
 
 const {
   OK,

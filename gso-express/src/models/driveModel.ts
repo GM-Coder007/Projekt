@@ -2,6 +2,7 @@ import { Point } from "geojson";
 import { Schema, model, Date } from "mongoose";
 
 export interface IDrive {
+  name?: string;
   start?: Point;
   end?: Point;
   averageSpeed?: number;
@@ -12,6 +13,7 @@ export interface IDrive {
 
 const driveSchema = new Schema<IDrive>(
   {
+    name: String,
     start: {
       type: {
         type: String,

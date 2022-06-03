@@ -7,10 +7,11 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
 import StatusCodes from "http-status-codes";
+import driveRoutes from "./routes/driveRoutes";
+import rawRoadQualityRoutes from "./routes/rawRoadQualityRoutes";
+import roadQualityRoutes from "./routes/roadQualityRoutes";
+import roadWorksRoutes from "./routes/roadWorksRoutes";
 import userRoutes from "./routes/userRoutes";
-import dataRoutes from "./routes/dataRoutes";
-import voznjaRoutes from "./routes/voznjaRoutes";
-import hitrostRoutes from "./routes/hitrostRoutes";
 
 dotenv.config();
 
@@ -62,9 +63,10 @@ app.use(express.static(path.join(__dirname, "public")));
 const { NOT_FOUND } = StatusCodes;
 
 app.use("/users", userRoutes);
-app.use("/data", dataRoutes);
-app.use('/voznja', voznjaRoutes);
-app.use('/hitrost', hitrostRoutes);
+app.use("/drives", driveRoutes);
+app.use("/rawRoadQuality", rawRoadQualityRoutes);
+app.use("/roadQuality", roadQualityRoutes);
+app.use("/roadWorks", roadWorksRoutes);
 
 app.use(function (req: Request, res: Response) {
   res.status(NOT_FOUND).json({ msg: "Not found" });
