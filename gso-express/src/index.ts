@@ -12,6 +12,8 @@ import rawRoadQualityRoutes from "./routes/rawRoadQualityRoutes";
 import roadQualityRoutes from "./routes/roadQualityRoutes";
 import roadWorksRoutes from "./routes/roadWorksRoutes";
 import userRoutes from "./routes/userRoutes";
+import { IUser } from "./models/userModel";
+import { expressjwt } from "express-jwt";
 
 dotenv.config();
 
@@ -46,6 +48,19 @@ declare module "express-session" {
   }
 }
 
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: IUser;
+  }
+}
+
+app.use(
+  expressjwt({
+    secret: process.env.ACCESS_TOKEN_SECRET || "DEFINE_ME",
+    algorithms: ["HS256"],
+  })
+);
+
 app.use(
   session({
     secret: "prosim za dobro oceno",
@@ -73,3 +88,6 @@ app.use(function (req: Request, res: Response) {
 });
 
 app.listen(port);
+function jwt(arg0: { secret: string; algorithms: string[] }) {
+  throw new Error("Function not implemented.");
+}
