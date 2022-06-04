@@ -1,10 +1,16 @@
 import { Router } from "express";
 import driveController from "../controllers/driveController";
-import authorizeAPI from "../middlewares/authorizeAPI";
+import apiMiddleware from "../middlewares/apiMiddleware";
+import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
 router.get("/drives", driveController.driveGet);
-router.post("/drives", authorizeAPI, driveController.drivePost);
+router.post(
+  "/drives",
+  apiMiddleware,
+  denyMiddleware,
+  driveController.drivePost
+);
 
 export default router;

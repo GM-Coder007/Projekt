@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
 import User from "../models/userModel";
 import { validationResult } from "express-validator";
+import { sign } from "jsonwebtoken";
+import { IUser } from "../models/userModel";
 
 const {
   OK,
@@ -12,6 +14,20 @@ const {
   CONFLICT,
   INTERNAL_SERVER_ERROR,
 } = StatusCodes;
+
+function profile(req: Request, res: Response) {
+  if (req.user) {
+    const user = req.user;
+
+    return res.json({
+      _id: user._id,
+      email: user.email,
+      twofa: user.twofa,
+      createdAt: user.createdAt,
+    });
+  }
+  return res.status(UNAUTHORIZED).json({ msg: "No user found" });
+}
 
 async function login(req: Request, res: Response) {
   const errors = validationResult(req);
@@ -34,7 +50,20 @@ async function login(req: Request, res: Response) {
         msg: "Wrong username or password.",
       });
     } else {
-      req.session.userId = user._id.toString();
+      if (req.query.type === "jwt") {
+        const secret = process.env.ACCESS_TOKEN_SECRET;
+        const expire = process.env.ACCESS_TOKEN_EXPIRE || "30d";
+        if (secret == null)
+          return res
+            .status(INTERNAL_SERVER_ERROR)
+            .json({ msg: "No configured secret" });
+        const token = sign({ sub: user._id }, secret, {
+          expiresIn: expire,
+        });
+        return res.json({ token });
+      } else {
+        req.session.userId = user._id.toString();
+      }
 
       return res.json({
         _id: user._id,
@@ -81,6 +110,27 @@ async function register(req: Request, res: Response) {
       .status(CREATED)
       .json({ _id: user._id, email: user.email, createdAt: user.createdAt });
   });
+}
+
+async function edit(req: Request, res: Response) {
+  if (req.user) {
+    if (req.body.twofa === true) req.user.twofa = req.body.twofa;
+    else if (req.body.twofa === false) req.user.twofa = req.body.twofa;
+    try {
+      await req.user.save();
+      return res.json({
+        _id: req.user._id,
+        email: req.user.email,
+        twofa: req.user.twofa,
+        createdAt: req.user.createdAt,
+      });
+    } catch (err) {
+      return res.status(INTERNAL_SERVER_ERROR).json({
+        msg: "Server error.",
+      });
+    }
+  }
+  return res.status(UNAUTHORIZED).json({ msg: "No user found" });
 }
 
 /*function list(req: Request, res: Response) {
@@ -206,6 +256,8 @@ export default {
 */
 
 export default {
+  profile,
   login,
   register,
+  edit,
 } as const;

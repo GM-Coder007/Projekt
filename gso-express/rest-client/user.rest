@@ -1,0 +1,22 @@
+POST http://localhost:4000/users/login?type=jwt
+Content-Type: application/json
+
+{
+    "email": "jan@gradic.net",
+    "password": "jan"
+}
+
+###
+
+GET http://localhost:4000/users/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjhlMDgxODAwNzU3NGIyMmM0MzM3YmMiLCJpYXQiOjE2NTQzNjIyMDEsImV4cCI6MTY1Njk1NDIwMX0.DVzoING6cGT3k98YcRa8Fy-NBmPNkL2dNmn-4xNjzf8
+
+###
+
+PUT http://localhost:4000/users/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjhlMDgxODAwNzU3NGIyMmM0MzM3YmMiLCJpYXQiOjE2NTQzNjIyMDEsImV4cCI6MTY1Njk1NDIwMX0.DVzoING6cGT3k98YcRa8Fy-NBmPNkL2dNmn-4xNjzf8
+Content-Type: application/json
+
+{
+    "twofa": false
+}

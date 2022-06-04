@@ -1,22 +1,22 @@
 import { Router } from "express";
 import rawRoadQualityController from "../controllers/rawRoadQualityController";
-import authorizeAPI from "../middlewares/authorizeAPI";
-import authorizeJWT from "../middlewares/jwtMiddleware";
-import authorizeSession from "../middlewares/sessionMiddleware";
+import apiMiddleware from "../middlewares/apiMiddleware";
+import authMiddleware from "../middlewares/authMiddleware";
+import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
 router.get(
   "/rawroadquality",
-  authorizeJWT,
-  authorizeSession,
-  authorizeAPI,
+  authMiddleware,
+  apiMiddleware,
+  denyMiddleware,
   rawRoadQualityController.rawroadqualityGet
 );
 router.post(
   "/rawroadquality",
-  authorizeJWT,
-  authorizeSession,
+  authMiddleware,
+  denyMiddleware,
   rawRoadQualityController.rawroadqualityPost
 );
 

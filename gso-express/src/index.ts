@@ -1,6 +1,12 @@
-import express, { Express, Request, Response } from "express";
+import express, {
+  Express,
+  NextFunction,
+  Request,
+  Response,
+  Errback,
+} from "express";
 import cors from "cors";
-import mongoose from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
@@ -50,7 +56,8 @@ declare module "express-session" {
 
 declare module "express-serve-static-core" {
   interface Request {
-    user?: IUser;
+    user?: HydratedDocument<IUser>;
+    machine?: boolean;
   }
 }
 
@@ -58,8 +65,22 @@ app.use(
   expressjwt({
     secret: process.env.ACCESS_TOKEN_SECRET || "DEFINE_ME",
     algorithms: ["HS256"],
-  })
+    credentialsRequired: false,
+  }) //.unless({ path: ["/users/login", "/users/register"] })
 );
+
+app.use(function (
+  err: Errback,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (err.name === "UnauthorizedError") {
+    res.status(401).json({ msg: "Invalid token" });
+  } else {
+    next(err);
+  }
+});
 
 app.use(
   session({

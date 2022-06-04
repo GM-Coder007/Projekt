@@ -1,6 +1,7 @@
 import { Router } from "express";
 import roadQualityController from "../controllers/roadQualityController";
-import authorizeAPI from "../middlewares/authorizeAPI";
+import apiMiddleware from "../middlewares/apiMiddleware";
+import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
@@ -8,7 +9,8 @@ router.get("/roadquality", roadQualityController.roadqualityGet);
 router.get("/roadquality/:driveId", roadQualityController.roadqualityGet);
 router.post(
   "/roadquality",
-  authorizeAPI,
+  apiMiddleware,
+  denyMiddleware,
   roadQualityController.roadqualityPost
 );
 
