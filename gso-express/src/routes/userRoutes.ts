@@ -1,13 +1,17 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
 import userController from "../controllers/userController";
-import { body, validationResult } from "express-validator";
+import { body, query } from "express-validator";
+import authMiddleware from "../middlewares/authMiddleware";
+import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
+router.get("/profile", authMiddleware, denyMiddleware, userController.profile);
 router.post(
   "/login",
   body("email").isEmail().normalizeEmail(),
   body("password").isString().not().isEmpty(),
+  query("setCookie").default(false).isBoolean(),
   userController.login
 );
 router.post(
@@ -16,11 +20,12 @@ router.post(
   body("password").isString().not().isEmpty(),
   userController.register
 );
-
-/*router.get("/", userController.list);
-router.get("/:id", userController.show);
-router.post("/", userController.create);
-router.put("/:id", userController.update);
-router.delete("/:id", userController.remove);*/
+router.put(
+  "/profile",
+  authMiddleware,
+  denyMiddleware,
+  body("twofa").isBoolean().not().isEmpty(),
+  userController.edit
+);
 
 export default router;

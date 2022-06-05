@@ -1,13 +1,13 @@
 import { Grid } from "@mui/material";
-import { Point } from "leaflet";
+import { Point } from "geojson";
 import React, { useEffect, useState } from "react";
 import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
 import Drive from "../components/drive";
 
 interface IDrive {
   _id: string;
-  start: Point;
-  end: Point;
+  start: any;
+  end: any;
   averageSpeed?: number;
   maxSpeed?: number;
   createdAt: string;
@@ -43,15 +43,37 @@ const FrontPage: React.FC = () => {
     return <div>Loading...</div>;
   } else {
     return (
-      <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
-        <Polyline
-          pathOptions={{ color: "lime" }}
-          positions={[
-            [46.55031007765001, 15.638652076533498],
-            [46.55901615879933, 15.638394273160692],
-          ]}
-        />
-      </MapContainer>
+      <>
+        <Grid container direction="column" alignItems="center">
+          {drives.map((drive) => (
+            <Drive
+              id={drive._id}
+              averageSpeed={drive.averageSpeed}
+              maxSpeed={drive.maxSpeed}
+              createdAt={drive.createdAt}
+              key={drive._id}
+            />
+          ))}
+        </Grid>
+        <MapContainer
+          center={[46.55031007765001, 15.638652076533498]}
+          zoom={13}
+          scrollWheelZoom={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Polyline
+            pathOptions={{ color: "lime" }}
+            positions={[
+              drives[0].start.coordinates,
+              //[46.55654268154934, 15.645938299807277],
+              drives[0].end.coordinates,
+            ]}
+          />
+        </MapContainer>
+      </>
     );
   }
 };
