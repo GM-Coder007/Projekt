@@ -1,4 +1,14 @@
-POST http://localhost:4000/users/login?type=jwt
+POST http://localhost:4000/users/register
+Content-Type: application/json
+
+{
+    "email": "jan@gradic.net",
+    "password": "jan"
+}
+
+###
+
+POST http://localhost:4000/users/login
 Content-Type: application/json
 
 {
@@ -9,14 +19,14 @@ Content-Type: application/json
 ###
 
 GET http://localhost:4000/users/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjhlMDgxODAwNzU3NGIyMmM0MzM3YmMiLCJpYXQiOjE2NTQzNjIyMDEsImV4cCI6MTY1Njk1NDIwMX0.DVzoING6cGT3k98YcRa8Fy-NBmPNkL2dNmn-4xNjzf8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjliZDY2MTQyZGIyNTk2OTk0OTRmNjkiLCJ0d29mYSI6ZmFsc2UsImlhdCI6MTY1NDM4MDY1OCwiZXhwIjoxNjU2OTcyNjU4fQ.63vFCUtZSiLSSwb3-DpAXEflBTLkxPuuUjASqLIsa4M
 
 ###
 
 PUT http://localhost:4000/users/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjhlMDgxODAwNzU3NGIyMmM0MzM3YmMiLCJpYXQiOjE2NTQzNjIyMDEsImV4cCI6MTY1Njk1NDIwMX0.DVzoING6cGT3k98YcRa8Fy-NBmPNkL2dNmn-4xNjzf8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjliZDY2MTQyZGIyNTk2OTk0OTRmNjkiLCJ0d29mYSI6ZmFsc2UsImlhdCI6MTY1NDM4MDY1OCwiZXhwIjoxNjU2OTcyNjU4fQ.63vFCUtZSiLSSwb3-DpAXEflBTLkxPuuUjASqLIsa4M
 Content-Type: application/json
 
 {
-    "twofa": false
+    "twofa": true
 }

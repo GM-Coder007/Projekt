@@ -3,7 +3,6 @@ import StatusCodes from "http-status-codes";
 import User from "../models/userModel";
 import { validationResult } from "express-validator";
 import { sign } from "jsonwebtoken";
-import { IUser } from "../models/userModel";
 
 const {
   OK,
@@ -24,6 +23,7 @@ function profile(req: Request, res: Response) {
       email: user.email,
       twofa: user.twofa,
       createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     });
   }
   return res.status(UNAUTHORIZED).json({ msg: "No user found" });
@@ -50,26 +50,20 @@ async function login(req: Request, res: Response) {
         msg: "Wrong username or password.",
       });
     } else {
-      if (req.query.type === "jwt") {
-        const secret = process.env.ACCESS_TOKEN_SECRET;
-        const expire = process.env.ACCESS_TOKEN_EXPIRE || "30d";
-        if (secret == null)
-          return res
-            .status(INTERNAL_SERVER_ERROR)
-            .json({ msg: "No configured secret" });
-        const token = sign({ sub: user._id }, secret, {
-          expiresIn: expire,
-        });
-        return res.json({ token });
-      } else {
-        req.session.userId = user._id.toString();
-      }
-
-      return res.json({
-        _id: user._id,
-        email: user.email,
-        createdAt: user.createdAt,
+      const secret = process.env.ACCESS_TOKEN_SECRET;
+      const expireString = process.env.ACCESS_TOKEN_EXPIRE || "2592000";
+      const expire = parseInt(expireString);
+      if (secret == null)
+        return res
+          .status(INTERNAL_SERVER_ERROR)
+          .json({ msg: "No configured secret" });
+      const token = sign({ sub: user._id, twofa: user.twofa }, secret, {
+        expiresIn: expire,
       });
+      if (req.query.setCookie === "true" || req.query.setCookie === "1") {
+        res.cookie("token", token, { httpOnly: true, maxAge: expire * 1000 });
+      }
+      return res.json({ token });
     }
   });
 }
@@ -106,9 +100,13 @@ async function register(req: Request, res: Response) {
         msg: "Server error.",
       });
     }
-    return res
-      .status(CREATED)
-      .json({ _id: user._id, email: user.email, createdAt: user.createdAt });
+    return res.status(CREATED).json({
+      _id: user._id,
+      email: user.email,
+      twofa: user.twofa,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   });
 }
 

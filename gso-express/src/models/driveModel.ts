@@ -1,5 +1,5 @@
 import { Point } from "geojson";
-import { Schema, model, Date } from "mongoose";
+import { Schema, model, Date, Types } from "mongoose";
 
 export interface IDrive {
   name?: string;
@@ -7,6 +7,7 @@ export interface IDrive {
   end?: Point;
   averageSpeed?: number;
   maxSpeed?: number;
+  user: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +39,11 @@ const driveSchema = new Schema<IDrive>(
     },
     averageSpeed: { type: Number },
     maxSpeed: { type: Number },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );

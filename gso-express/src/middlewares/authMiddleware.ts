@@ -10,13 +10,19 @@ export default async function authMiddleware(
   if (req.auth?.sub) {
     try {
       const user = await User.findById(req.auth.sub).exec();
-      if (user) req.user = user;
+      if (user) {
+        if (user.twofa === false) req.user = user;
+        else if (req.auth.twofa === true) req.user = user;
+      }
     } catch (err) {}
-  } else if (req.session.userId) {
+  } /*else if (req.session.userId) {
     try {
       const user = await User.findById(req.session.userId).exec();
-      if (user) req.user = user;
+      if (user) {
+        if (user.twofa === false) req.user = user;
+        else if (req.session.twofa === true) req.user = user;
+      }
     } catch (err) {}
-  }
+  }*/
   next();
 }

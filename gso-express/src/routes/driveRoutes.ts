@@ -12,5 +12,17 @@ router.post(
   denyMiddleware,
   driveController.drivePost
 );
+router.put(
+  "/drives/:id",
+  apiMiddleware,
+  denyMiddleware,
+  driveController.drivePut
+);
+router.delete(
+  "/drives",
+  apiMiddleware,
+  denyMiddleware,
+  driveController.driveDelete
+);
 
 export default router;

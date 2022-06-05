@@ -7,8 +7,8 @@ import express, {
 } from "express";
 import cors from "cors";
 import mongoose, { HydratedDocument } from "mongoose";
-import session from "express-session";
-import MongoStore from "connect-mongo";
+//import session from "express-session";
+//import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
@@ -26,7 +26,6 @@ dotenv.config();
 const port = process.env.PORT || 3000;
 const mongoDB = process.env.MONGO_STRING || "mongodb://localhost/projekt";
 
-//var mongoDB = "mongodb://localhost/projekt";
 mongoose.connect(mongoDB);
 
 const app: Express = express();
@@ -48,11 +47,12 @@ app.use(
   })
 );
 
-declare module "express-session" {
+/*declare module "express-session" {
   interface SessionData {
     userId: string;
+    twofa: boolean;
   }
-}
+}*/
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -61,11 +61,37 @@ declare module "express-serve-static-core" {
   }
 }
 
+/*app.use(
+  session({
+    secret: "prosim za dobro oceno",
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: mongoDB }),
+  })
+);*/
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(
   expressjwt({
     secret: process.env.ACCESS_TOKEN_SECRET || "DEFINE_ME",
     algorithms: ["HS256"],
     credentialsRequired: false,
+    getToken: function fromHeaderOrQuerystring(req: Request) {
+      if (
+        req.headers.authorization &&
+        req.headers.authorization.split(" ")[0] === "Bearer" &&
+        req.headers.authorization.split(" ")[1]
+      ) {
+        return req.headers.authorization.split(" ")[1];
+      } else if (req.cookies.token) {
+        return req.cookies.token;
+      }
+      return null;
+    },
   }) //.unless({ path: ["/users/login", "/users/register"] })
 );
 
@@ -82,33 +108,15 @@ app.use(function (
   }
 });
 
-app.use(
-  session({
-    secret: "prosim za dobro oceno",
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: mongoDB }),
-  })
-);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-
-const { NOT_FOUND } = StatusCodes;
-
 app.use("/users", userRoutes);
 app.use("/drives", driveRoutes);
 app.use("/rawRoadQuality", rawRoadQualityRoutes);
 app.use("/roadQuality", roadQualityRoutes);
 app.use("/roadWorks", roadWorksRoutes);
 
+const { NOT_FOUND } = StatusCodes;
 app.use(function (req: Request, res: Response) {
   res.status(NOT_FOUND).json({ msg: "Not found" });
 });
 
 app.listen(port);
-function jwt(arg0: { secret: string; algorithms: string[] }) {
-  throw new Error("Function not implemented.");
-}

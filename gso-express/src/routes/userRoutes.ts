@@ -11,7 +11,7 @@ router.post(
   "/login",
   body("email").isEmail().normalizeEmail(),
   body("password").isString().not().isEmpty(),
-  query("type").default("session").isIn(["session", "jwt"]),
+  query("setCookie").default(false).isBoolean(),
   userController.login
 );
 router.post(
