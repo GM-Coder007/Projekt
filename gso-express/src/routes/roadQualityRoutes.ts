@@ -5,10 +5,10 @@ import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
-router.get("/roadquality", roadQualityController.roadqualityGet);
-router.get("/roadquality/:driveId", roadQualityController.roadqualityGet);
+router.get("/", roadQualityController.roadqualityGet);
+router.get("/:driveId", roadQualityController.roadqualityGet);
 router.post(
-  "/roadquality",
+  "/",
   apiMiddleware,
   denyMiddleware,
   roadQualityController.roadqualityPost

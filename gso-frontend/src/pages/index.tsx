@@ -1,8 +1,8 @@
 import { Grid } from "@mui/material";
-import { Point } from "geojson";
 import React, { useEffect, useState } from "react";
-import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Polyline, TileLayer } from "react-leaflet";
 import Drive from "../components/drive";
+import Header from "../components/header";
 
 interface IDrive {
   _id: string;
@@ -19,18 +19,16 @@ const FrontPage: React.FC = () => {
   const [drives, setDrives] = useState<IDrive[]>([]);
 
   const refreshDrives = () => {
-    fetch("http://localhost:4000/data/drives")
+    fetch("http://localhost:4000/drives")
       .then((res) => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setDrives(result);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+      .then((result) => {
+        setIsLoaded(true);
+        setDrives(result);
+      })
+      .catch((error) => {
+        setIsLoaded(true);
+        setError(error);
+      });
   };
 
   useEffect(() => {
@@ -44,20 +42,11 @@ const FrontPage: React.FC = () => {
   } else {
     return (
       <>
-        <Grid container direction="column" alignItems="center">
-          {drives.map((drive) => (
-            <Drive
-              id={drive._id}
-              averageSpeed={drive.averageSpeed}
-              maxSpeed={drive.maxSpeed}
-              createdAt={drive.createdAt}
-              key={drive._id}
-            />
-          ))}
-        </Grid>
+        <Header logged_in={true} />
+
         <MapContainer
-          center={[46.55031007765001, 15.638652076533498]}
-          zoom={13}
+          center={[46.55917562552739, 15.638073505305133]}
+          zoom={10}
           scrollWheelZoom={true}
         >
           <TileLayer

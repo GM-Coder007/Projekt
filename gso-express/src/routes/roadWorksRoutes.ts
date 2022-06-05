@@ -5,9 +5,9 @@ import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
-router.get("/roadworks", roadWorksController.roadworksGet);
+router.get("/", roadWorksController.roadworksGet);
 router.post(
-  "/roadworks",
+  "/",
   apiMiddleware,
   denyMiddleware,
   roadWorksController.roadworksPost

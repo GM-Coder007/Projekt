@@ -5,24 +5,9 @@ import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
-router.get("/drives", driveController.driveGet);
-router.post(
-  "/drives",
-  apiMiddleware,
-  denyMiddleware,
-  driveController.drivePost
-);
-router.put(
-  "/drives/:id",
-  apiMiddleware,
-  denyMiddleware,
-  driveController.drivePut
-);
-router.delete(
-  "/drives",
-  apiMiddleware,
-  denyMiddleware,
-  driveController.driveDelete
-);
+router.get("/", driveController.driveGet);
+router.post("/", apiMiddleware, denyMiddleware, driveController.drivePost);
+router.put("/:id", apiMiddleware, denyMiddleware, driveController.drivePut);
+router.delete("/", apiMiddleware, denyMiddleware, driveController.driveDelete);
 
 export default router;
