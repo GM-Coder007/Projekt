@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
-import Drive, { IDrive } from "../models/driveModel";
-import { Point } from "geojson";
-import { CallbackError, HydratedDocument } from "mongoose";
+import Drive from "../models/driveModel";
+import RawRoadQuality from "../models/rawRoadQualityModel";
+import RoadQuality from "../models/roadQualityModel";
 
 const {
   OK,
@@ -10,6 +10,7 @@ const {
   NO_CONTENT,
   NOT_FOUND,
   UNAUTHORIZED,
+  FORBIDDEN,
   CONFLICT,
   INTERNAL_SERVER_ERROR,
 } = StatusCodes;
@@ -26,75 +27,108 @@ function driveGet(req: Request, res: Response) {
   });
 }
 
-function drivePost(req: Request, res: Response) {
-  const name: string = req.body.name;
-  const start: Point = req.body.start;
-  const end: Point = req.body.end;
-  const averageSpeed: number = req.body.averageSpeed;
-  const maxSpeed: number = req.body.maxSpeed;
+async function drivePost(req: Request, res: Response) {
+  const user = req.user?.id;
+  if (!user) return res.status(UNAUTHORIZED).json({ msg: "No user found" });
 
-  var driveS = new Drive({ start, end, averageSpeed, maxSpeed });
+  var drive = new Drive();
+  if (req.body.name) drive.name = req.body.name;
+  if (req.body.start) drive.start = req.body.start;
+  if (req.body.end) drive.end = req.body.end;
+  if (req.body.averageSpeed) drive.averageSpeed = req.body.averageSpeed;
+  if (req.body.maxSpeed) drive.maxSpeed = req.body.maxSpeed;
+  drive.user = user;
 
-  driveS.save(function (err, drive) {
-    if (err) {
-      return res.status(INTERNAL_SERVER_ERROR).json({
-        msg: "Server error.",
-      });
-    }
-    return res.status(CREATED).json(drive);
-  });
+  try {
+    await drive.save();
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+
+  return res.status(CREATED).json(drive);
 }
 
-function drivePut(req: Request, res: Response) {
-  const id: string = req.params.id;
-  const name: string = req.body.name;
-  const start: Point = req.body.start;
-  const end: Point = req.body.end;
-  const averageSpeed: number = req.body.averageSpeed;
-  const maxSpeed: number = req.body.maxSpeed;
+async function drivePut(req: Request, res: Response) {
+  const user = req.user?.id;
+  if (!user) return res.status(UNAUTHORIZED).json({ msg: "No user found" });
 
-  Drive.findByIdAndUpdate(
-    id,
-    { start, end, averageSpeed, maxSpeed },
-    function (err, drive) {
-      if (err) {
-        return res.status(INTERNAL_SERVER_ERROR).json({
-          msg: "Server error.",
-        });
-      }
+  const id = req.params.id;
 
-      if (!drive) {
-        return res.status(NOT_FOUND).json({
-          msg: "Drive with that id not found.",
-        });
-      }
+  let drive;
+  try {
+    drive = await Drive.findById(id).exec();
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
 
-      return res.status(OK).json(drive);
-    }
-  );
+  if (!drive) {
+    return res.status(NOT_FOUND).json({
+      msg: "Drive with that id not found.",
+    });
+  }
+
+  if (drive.user.toString() !== user)
+    return res
+      .status(FORBIDDEN)
+      .json({ msg: "You don't have access to this resource" });
+
+  drive.name = req.body.name ? req.body.name : drive.name;
+  drive.start = req.body.start ? req.body.start : drive.start;
+  drive.end = req.body.end ? req.body.end : drive.end;
+  drive.averageSpeed = req.body.averageSpeed
+    ? req.body.averageSpeed
+    : drive.averageSpeed;
+  drive.maxSpeed = req.body.maxSpeed ? req.body.maxSpeed : drive.maxSpeed;
+
+  try {
+    await drive.save();
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+
+  return res.status(OK).json(drive);
 }
 
-function driveDelete(req: Request, res: Response) {
+async function driveDelete(req: Request, res: Response) {
   const id: string = req.params.id;
 
-  Drive.findByIdAndRemove(
-    id,
-    function (err: CallbackError, drive: HydratedDocument<IDrive>) {
-      if (err) {
-        return res.status(INTERNAL_SERVER_ERROR).json({
-          msg: "Server error.",
-        });
-      }
+  try {
+    await RawRoadQuality.deleteMany({ drive: id });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
 
-      if (!drive) {
-        return res.status(NOT_FOUND).json({
-          msg: "Drive with that id not found.",
-        });
-      }
+  try {
+    await RoadQuality.deleteMany({ drive: id });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
 
-      return res.status(NO_CONTENT).json();
-    }
-  );
+  let drive;
+  try {
+    drive = await Drive.findByIdAndRemove(id).exec();
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+
+  if (!drive) {
+    return res.status(NOT_FOUND).json({
+      msg: "Drive with that id not found.",
+    });
+  }
+  return res.json(drive);
 }
 
 export default {

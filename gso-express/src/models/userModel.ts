@@ -11,6 +11,7 @@ import bcrypt from "bcrypt";
 export interface IUser {
   email: string;
   password: string;
+  twofa: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,7 @@ const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true },
     password: { type: String, required: true },
+    twofa: { type: Boolean, default: false, required: true },
   },
   { timestamps: true }
 );

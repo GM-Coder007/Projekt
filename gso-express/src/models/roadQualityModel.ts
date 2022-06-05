@@ -1,10 +1,12 @@
 import { Point } from "geojson";
-import { Schema, model, Date } from "mongoose";
+import { Schema, model, Date, Types } from "mongoose";
 
 export interface IRoadQuality {
   start: Point;
   end: Point;
   quality: number;
+  user: Types.ObjectId;
+  drive: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +36,16 @@ const roadQualitySchema = new Schema<IRoadQuality>(
       },
     },
     quality: { type: Number, required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    drive: {
+      type: Schema.Types.ObjectId,
+      ref: "Drive",
+      required: true,
+    },
   },
   { timestamps: true }
 );

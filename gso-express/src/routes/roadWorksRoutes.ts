@@ -1,9 +1,16 @@
 import { Router } from "express";
-import roadQualityController from "../controllers/roadQualityController";
+import roadWorksController from "../controllers/roadWorksController";
+import apiMiddleware from "../middlewares/apiMiddleware";
+import denyMiddleware from "../middlewares/denyMiddleware";
 
 const router = Router();
 
-router.get("/roadquality", roadQualityController.roadqualityGet);
-router.post("/roadquality", roadQualityController.roadqualityPost);
+router.get("/roadworks", roadWorksController.roadworksGet);
+router.post(
+  "/roadworks",
+  apiMiddleware,
+  denyMiddleware,
+  roadWorksController.roadworksPost
+);
 
 export default router;
