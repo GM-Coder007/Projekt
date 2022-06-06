@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
@@ -10,6 +12,9 @@ from selenium.common.exceptions import TimeoutException
     https://stackoverflow.com/questions/45448994/wait-page-to-load-before-getting-data-with-requests-get-in-python-3/68787500#68787500
 """
 
+CHROME_DRIVER_PATH = './chromedriver.exe'
+CHROME_SERVICE = Service(ChromeDriverManager().install())
+
 
 def get_traffic_info(url):
     TIMEOUT = 5
@@ -18,7 +23,7 @@ def get_traffic_info(url):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--log-level=3")
-    browser = webdriver.Chrome(options=options, executable_path='./chromedriver.exe')
+    browser = webdriver.Chrome(options=options, service=CHROME_SERVICE)
 
     sections = []
 
