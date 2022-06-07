@@ -1,38 +1,33 @@
 import { Card, CardContent, Typography } from "@mui/material";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
-interface DriveProps {
-  id: string;
+export interface IDrive {
+  _id: string;
+  start: any;
+  end: any;
   averageSpeed?: number;
   maxSpeed?: number;
   createdAt: string;
 }
 
-const Drive: React.FC<DriveProps> = ({
-  id,
-  averageSpeed,
-  maxSpeed,
-  createdAt,
-}) => {
-  const navigation = useNavigate();
+interface DriveProps {
+  drive: IDrive;
+}
 
-  const [vote, setVote] = useState(0);
-  const [error, setError] = useState(null);
-
-  const date = new Date(createdAt);
+const Drive: React.FC<DriveProps> = ({ drive }) => {
+  const date = new Date(drive.createdAt);
 
   return (
     <Card>
       <CardContent>
         <Typography variant="body1" color="text.primary">
-          {id}
+          {drive._id}
         </Typography>
         <Typography variant="body1" color="text.primary">
-          {averageSpeed}
+          {drive.averageSpeed}
         </Typography>
         <Typography variant="body1" color="text.primary">
-          {maxSpeed}
+          {drive.maxSpeed}
         </Typography>
         <Typography variant="body1" color="text.primary">
           {date.toLocaleString()}

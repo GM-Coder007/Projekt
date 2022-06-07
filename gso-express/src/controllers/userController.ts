@@ -29,6 +29,17 @@ function profile(req: Request, res: Response) {
   return res.status(UNAUTHORIZED).json({ msg: "No user found" });
 }
 
+function logout(req: Request, res: Response) {
+  //res.clearCookie("token");
+  res.cookie("token", "logged out", {
+    httpOnly: true,
+    maxAge: 1000,
+    domain: process.env.COOKIE_DOMAIN || "localhost",
+    sameSite: "strict",
+  });
+  return res.json({ msg: "Logged out" });
+}
+
 async function login(req: Request, res: Response) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -61,7 +72,12 @@ async function login(req: Request, res: Response) {
         expiresIn: expire,
       });
       if (req.query.setCookie === "true" || req.query.setCookie === "1") {
-        res.cookie("token", token, { httpOnly: true, maxAge: expire * 1000 });
+        res.cookie("token", token, {
+          httpOnly: true,
+          maxAge: expire * 1000,
+          domain: process.env.COOKIE_DOMAIN || "localhost",
+          sameSite: "strict",
+        });
       }
       return res.json({ token });
     }
@@ -255,6 +271,7 @@ export default {
 
 export default {
   profile,
+  logout,
   login,
   register,
   edit,

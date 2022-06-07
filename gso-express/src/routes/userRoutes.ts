@@ -7,6 +7,7 @@ import denyMiddleware from "../middlewares/denyMiddleware";
 const router = Router();
 
 router.get("/profile", authMiddleware, denyMiddleware, userController.profile);
+router.get("/logout", authMiddleware, denyMiddleware, userController.logout);
 router.post(
   "/login",
   body("email").isEmail().normalizeEmail(),

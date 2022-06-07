@@ -12,6 +12,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getAPIEndpoint } from "../variables";
 
 const LoginPage: React.FC = () => {
   const [error, setError] = useState("");
@@ -27,7 +28,7 @@ const LoginPage: React.FC = () => {
       password: data.get("password"),
     };
 
-    fetch("http://localhost:4000/users/login", {
+    fetch(getAPIEndpoint() + "/users/login?setCookie=true", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -43,7 +44,7 @@ const LoginPage: React.FC = () => {
       if (res.ok) {
         navigate("/");
       } else {
-        const error = (data && data.message) || res.status;
+        const error = (data && data.msg) || res.status;
         setError(error);
       }
     });

@@ -12,6 +12,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getAPIEndpoint } from "../variables";
 
 const ProfilePage: React.FC = () => {
   const [error, setError] = useState("");
@@ -27,7 +28,7 @@ const ProfilePage: React.FC = () => {
       password: data.get("password"),
     };
 
-    fetch("http://localhost:4000/users/login", {
+    fetch(getAPIEndpoint() + "/users/login", {
       method: "POST",
       credentials: "include",
       headers: {

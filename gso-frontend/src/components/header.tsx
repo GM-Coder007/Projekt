@@ -10,34 +10,35 @@ import {
   Tooltip,
   Avatar,
   IconButton,
-  useTheme,
 } from "@mui/material";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getAPIEndpoint } from "../variables";
 
 const pages = [
   { text: "Home", link: "/" },
-  { text: "About us", link: "/about" },
+  { text: "Dashboard", link: "/dashboard" },
 ];
 
 const settings = [
-  { text: "Dashboard", link: "/dashboard" },
   { text: "Profile", link: "/profile" },
   { text: "Logout", link: "/logout" },
 ];
 
-interface HeaderProps {
+/*interface HeaderProps {
   logged_in?: boolean;
 }
 
 const defaultProps: HeaderProps = {
   logged_in: false,
-};
+};*/
 
-const Header: React.FC<HeaderProps> = ({ logged_in }) => {
-  const theme = useTheme();
+//const Header: React.FC<HeaderProps> = ({ logged_in }) => {
+
+const Header: React.FC = () => {
+  const [signedIn, setSignedIn] = useState(false);
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
@@ -55,6 +56,35 @@ const Header: React.FC<HeaderProps> = ({ logged_in }) => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  useEffect(() => {
+    fetch(getAPIEndpoint() + "/users/profile", {
+      credentials: "include",
+    }).then(async (res) => {
+      const isJson = res.headers
+        .get("content-type")
+        ?.includes("application/json");
+      //const data = isJson ? await res.json() : null;
+
+      if (res.ok) {
+        setSignedIn(true);
+      } else {
+        setSignedIn(false);
+      }
+    });
+  }, []);
+
+  function logout() {
+    fetch(getAPIEndpoint() + "/users/logout", {
+      credentials: "include",
+    }).then(async (res) => {
+      if (res.ok) {
+        setSignedIn(false);
+      } else {
+        setSignedIn(true);
+      }
+    });
+  }
 
   return (
     <AppBar position="static">
@@ -153,7 +183,7 @@ const Header: React.FC<HeaderProps> = ({ logged_in }) => {
             ))}
           </Box>
 
-          {logged_in ? (
+          {signedIn ? (
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -212,6 +242,6 @@ const Header: React.FC<HeaderProps> = ({ logged_in }) => {
   );
 };
 
-Header.defaultProps = defaultProps;
+//Header.defaultProps = defaultProps;
 
 export default Header;

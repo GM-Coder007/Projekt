@@ -1,13 +1,14 @@
 import { Container, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import Drive, { IDrive } from "../components/drive";
 import Header from "../components/header";
 import QualityMap, { ISection } from "../components/qualityMap";
-import Roadworks from "../components/roadworks";
 import { getAPIEndpoint } from "../variables";
 
-const FrontPage: React.FC = () => {
+const DashboardPage: React.FC = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [drives, setDrives] = useState<IDrive[]>([]);
   const [sections, setSections] = useState<ISection[]>([]);
 
   const refreshDrives = () => {
@@ -22,6 +23,7 @@ const FrontPage: React.FC = () => {
           quality: 10,
         });
         setSections(section);
+        setDrives(result);
       })
       .catch((error) => {
         setIsLoaded(true);
@@ -42,7 +44,7 @@ const FrontPage: React.FC = () => {
       <>
         <Header />
 
-        <Container>
+        <Container sx={{ mb: 4 }}>
           <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
             Road conditions
           </Typography>
@@ -50,26 +52,15 @@ const FrontPage: React.FC = () => {
           <QualityMap sections={sections} />
 
           <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
-            Traffic information
+            My trips
           </Typography>
-          <Roadworks />
+          {drives.map((drive) => (
+            <Drive key={drive._id} drive={drive} />
+          ))}
         </Container>
       </>
     );
   }
 };
 
-export default FrontPage;
-/*
-<Grid container direction="column" alignItems="center">
-          {drives.map((drive) => (
-            <Drive
-              id={drive._id}
-              averageSpeed={drive.averageSpeed}
-              maxSpeed={drive.maxSpeed}
-              createdAt={drive.createdAt}
-              key={drive._id}
-            />
-          ))}
-        </Grid>
-*/
+export default DashboardPage;
