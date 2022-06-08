@@ -23,6 +23,12 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
+    if (data.get("password") !== data.get("password2")) {
+      setError("Passwords do not match");
+      return;
+    }
+
     const registerInfo = {
       email: data.get("email"),
       password: data.get("password"),
@@ -85,6 +91,16 @@ const RegisterPage: React.FC = () => {
             label="Password"
             type="password"
             id="password"
+            autoComplete="current-password"
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password2"
+            label="Repeat password"
+            type="password"
+            id="password2"
             autoComplete="current-password"
           />
           {error && (

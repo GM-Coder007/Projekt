@@ -3,6 +3,7 @@ import StatusCodes from "http-status-codes";
 import User from "../models/userModel";
 import { validationResult } from "express-validator";
 import { sign } from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const {
   OK,
@@ -93,7 +94,7 @@ async function register(req: Request, res: Response) {
   }
 
   const email: string = req.body.email;
-  const password: string = req.body.password;
+  let password: string = req.body.password;
 
   try {
     var userCheck = await User.findOne({ email }).exec();
@@ -102,6 +103,14 @@ async function register(req: Request, res: Response) {
       return res.status(CONFLICT).json({
         msg: "Already registered with this email.",
       });
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+
+  try {
+    password = await bcrypt.hash(password, 10);
   } catch (err) {
     return res.status(INTERNAL_SERVER_ERROR).json({
       msg: "Server error.",
@@ -130,6 +139,19 @@ async function edit(req: Request, res: Response) {
   if (req.user) {
     if (req.body.twofa === true) req.user.twofa = req.body.twofa;
     else if (req.body.twofa === false) req.user.twofa = req.body.twofa;
+
+    if (req.body.password) {
+      try {
+        const password = req.body.password;
+        const hash = await bcrypt.hash(password, 10);
+        req.user.password = hash;
+      } catch (err) {
+        return res.status(INTERNAL_SERVER_ERROR).json({
+          msg: "Server error.",
+        });
+      }
+    }
+
     try {
       await req.user.save();
       return res.json({
