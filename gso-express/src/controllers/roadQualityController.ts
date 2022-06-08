@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
-import RoadQuality from "../models/roadQualityModel";
+import RoadQuality, { IRoadQuality } from "../models/roadQualityModel";
 import { Point } from "geojson";
+import { CallbackError, HydratedDocument } from "mongoose";
 
 const {
   OK,
@@ -25,6 +26,22 @@ function roadqualityGet(req: Request, res: Response) {
   });
 }
 
+function roadqualityGetById(req: Request, res: Response) {
+  const drive = req.params.driveId;
+  RoadQuality.find(
+    { drive },
+    function (err: CallbackError, roadquality: HydratedDocument<IRoadQuality>) {
+      if (err) {
+        return res.status(INTERNAL_SERVER_ERROR).json({
+          msg: "Server error.",
+        });
+      }
+
+      return res.json(roadquality);
+    }
+  );
+}
+
 function roadqualityPost(req: Request, res: Response) {
   const start: Point = req.body.start;
   const end: Point = req.body.end;
@@ -44,5 +61,6 @@ function roadqualityPost(req: Request, res: Response) {
 
 export default {
   roadqualityGet,
+  roadqualityGetById,
   roadqualityPost,
 } as const;

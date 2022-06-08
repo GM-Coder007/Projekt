@@ -77,7 +77,7 @@ userSchema.static(
   });
 };*/
 
-userSchema.pre("save", function (next) {
+/*userSchema.pre("save", function (next) {
   var user = this;
   bcrypt.hash(user.password, 10, function (err, hash) {
     if (err) {
@@ -86,7 +86,7 @@ userSchema.pre("save", function (next) {
     user.password = hash;
     next();
   });
-});
+});*/
 
 const User = model<IUser, UserModel>("User", userSchema);
 

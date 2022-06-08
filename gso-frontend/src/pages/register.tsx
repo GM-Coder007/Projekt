@@ -12,6 +12,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getAPIEndpoint } from "../variables";
 
 const RegisterPage: React.FC = () => {
   const [error, setError] = useState("");
@@ -22,12 +23,18 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
+    if (data.get("password") !== data.get("password2")) {
+      setError("Passwords do not match");
+      return;
+    }
+
     const registerInfo = {
       email: data.get("email"),
       password: data.get("password"),
     };
 
-    fetch("http://localhost:4000/users/register", {
+    fetch(getAPIEndpoint() + "/users/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,6 +91,16 @@ const RegisterPage: React.FC = () => {
             label="Password"
             type="password"
             id="password"
+            autoComplete="current-password"
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password2"
+            label="Repeat password"
+            type="password"
+            id="password2"
             autoComplete="current-password"
           />
           {error && (

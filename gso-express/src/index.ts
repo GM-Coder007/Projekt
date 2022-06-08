@@ -23,6 +23,7 @@ import { expressjwt } from "express-jwt";
 
 dotenv.config();
 
+const domain = process.env.CORS_DOMAIN || "localhost:3000";
 const port = process.env.PORT || 3000;
 const mongoDB = process.env.MONGO_STRING || "mongodb://localhost/projekt";
 
@@ -30,7 +31,13 @@ mongoose.connect(mongoDB);
 
 const app: Express = express();
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:4000"];
+const allowedOrigins = [
+  "http://" + domain,
+  "https://" + domain,
+  "http://localhost:3000",
+];
+//console.log(allowedOrigins);
+
 app.use(
   cors({
     credentials: true,

@@ -1,36 +1,35 @@
-import { Grid } from "@mui/material";
-import { Point } from "geojson";
+import { Container, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
-import Drive from "../components/drive";
-
-interface IDrive {
-  _id: string;
-  start: any;
-  end: any;
-  averageSpeed?: number;
-  maxSpeed?: number;
-  createdAt: string;
-}
+import Header from "../components/header";
+import QualityMap, { ISection } from "../components/qualityMap";
+import Roadworks from "../components/roadworks";
+import { getAPIEndpoint } from "../variables";
 
 const FrontPage: React.FC = () => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [drives, setDrives] = useState<IDrive[]>([]);
+  const [sections, setSections] = useState<ISection[]>([]);
 
   const refreshDrives = () => {
-    fetch("http://localhost:4000/data/drives")
+    fetch(getAPIEndpoint() + "/roadquality")
       .then((res) => res.json())
-      .then(
-        (result) => {
-          setIsLoaded(true);
-          setDrives(result);
-        },
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+      .then((result) => {
+        setIsLoaded(true);
+        let section: ISection[] = [];
+
+        result.forEach((drive: any) => {
+          section.push({
+            start: drive.start.coordinates,
+            end: drive.end.coordinates,
+            quality: drive.quality,
+          });
+        });
+        setSections(section);
+      })
+      .catch((error) => {
+        setIsLoaded(true);
+        setError(error);
+      });
   };
 
   useEffect(() => {
@@ -44,35 +43,20 @@ const FrontPage: React.FC = () => {
   } else {
     return (
       <>
-        <Grid container direction="column" alignItems="center">
-          {drives.map((drive) => (
-            <Drive
-              id={drive._id}
-              averageSpeed={drive.averageSpeed}
-              maxSpeed={drive.maxSpeed}
-              createdAt={drive.createdAt}
-              key={drive._id}
-            />
-          ))}
-        </Grid>
-        <MapContainer
-          center={[46.55031007765001, 15.638652076533498]}
-          zoom={13}
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <Polyline
-            pathOptions={{ color: "lime" }}
-            positions={[
-              drives[0].start.coordinates,
-              //[46.55654268154934, 15.645938299807277],
-              drives[0].end.coordinates,
-            ]}
-          />
-        </MapContainer>
+        <Header />
+
+        <Container>
+          <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
+            Road conditions
+          </Typography>
+
+          <QualityMap sections={sections} />
+
+          <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
+            Traffic information
+          </Typography>
+          <Roadworks />
+        </Container>
       </>
     );
   }

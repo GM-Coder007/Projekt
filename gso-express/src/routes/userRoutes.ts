@@ -7,6 +7,7 @@ import denyMiddleware from "../middlewares/denyMiddleware";
 const router = Router();
 
 router.get("/profile", authMiddleware, denyMiddleware, userController.profile);
+router.get("/logout", userController.logout);
 router.post(
   "/login",
   body("email").isEmail().normalizeEmail(),
@@ -24,7 +25,8 @@ router.put(
   "/profile",
   authMiddleware,
   denyMiddleware,
-  body("twofa").isBoolean().not().isEmpty(),
+  body("password").isString(),
+  body("twofa").isBoolean(),
   userController.edit
 );
 
