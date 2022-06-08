@@ -1,0 +1,8 @@
+FROM ubuntu
+MAINTAINER Skupina-GSO
+RUN apt-get update && apt-get install -y nodejs npm
+npm install -g react
+EXPOSE 3000 27017
+COPY . /gso-react/src
+WORKDIR /gso-react/src
+CMD ["npm", "start"]
