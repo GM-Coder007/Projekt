@@ -1,17 +1,18 @@
 import { Point } from "geojson";
 import { Schema, model, Date, Types } from "mongoose";
 
-export interface IRoadQuality {
+export interface IRawRoadQuality {
   start: Point;
   end: Point;
-  quality: number;
+  measurements: [[number, number, number]];
+  speed: number;
   user: Types.ObjectId;
   drive: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const roadQualitySchema = new Schema<IRoadQuality>(
+const rawRoadQualitySchema = new Schema<IRawRoadQuality>(
   {
     start: {
       type: {
@@ -35,7 +36,8 @@ const roadQualitySchema = new Schema<IRoadQuality>(
         required: true,
       },
     },
-    quality: { type: Number, required: true },
+    measurements: { type: [[Number, Number, Number]], required: true },
+    speed: { type: Number, required: true },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -50,6 +52,9 @@ const roadQualitySchema = new Schema<IRoadQuality>(
   { timestamps: true }
 );
 
-const RoadQuality = model<IRoadQuality>("RoadQuality", roadQualitySchema);
+const RawRoadQuality = model<IRawRoadQuality>(
+  "RawRoadQuality",
+  rawRoadQualitySchema
+);
 
-export default RoadQuality;
+export default RawRoadQuality;

@@ -11,7 +11,9 @@ import bcrypt from "bcrypt";
 export interface IUser {
   email: string;
   password: string;
+  twofa: boolean;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 interface UserModel extends Model<IUser> {
@@ -22,14 +24,14 @@ interface UserModel extends Model<IUser> {
   ): void;
 }
 
-const userSchema = new Schema<IUser>({
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-  createdAt: {
-    type: Date,
-    default: () => Date.now(),
+const userSchema = new Schema<IUser>(
+  {
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    twofa: { type: Boolean, default: false, required: true },
   },
-});
+  { timestamps: true }
+);
 
 userSchema.static(
   "authenticate",
@@ -75,7 +77,7 @@ userSchema.static(
   });
 };*/
 
-userSchema.pre("save", function (next) {
+/*userSchema.pre("save", function (next) {
   var user = this;
   bcrypt.hash(user.password, 10, function (err, hash) {
     if (err) {
@@ -84,7 +86,7 @@ userSchema.pre("save", function (next) {
     user.password = hash;
     next();
   });
-});
+});*/
 
 const User = model<IUser, UserModel>("User", userSchema);
 

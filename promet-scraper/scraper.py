@@ -1,103 +1,60 @@
 from bs4 import BeautifulSoup
-import urllib.request
-import time
-import json
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+
+"""
+    Install ChromeDriver for Chrome
+    https://stackoverflow.com/questions/45448994/wait-page-to-load-before-getting-data-with-requests-get-in-python-3/68787500#68787500
+"""
+
+CHROME_DRIVER_PATH = './chromedriver.exe'
+CHROME_SERVICE = Service(ChromeDriverManager().install())
 
 
-def get_all_traffic(url, filter=None):
-	req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-	html_page = urllib.request.urlopen(req).read()
-	soup = BeautifulSoup(html_page, 'html.parser').select(".EntityList-items .EntityList-item")
+def get_traffic_info(url):
+    TIMEOUT = 5
+    selector = ".scroll-content > span > div > p"
 
-	# DATA
-	traffics = []
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--log-level=3")
+    browser = webdriver.Chrome(options=options, service=CHROME_SERVICE)
 
-	for traffic in soup:
-		# TITLE
-		title = traffic.select(".fs-22px fw-bold text-primary")
+    sections = []
 
-		if len(title) > 0:
-			if filter is not None and isinstance(filter, list) and len(filter) > 0:
-				if any(term in title[0].text.lower() for term in filter):
-					title = title[0].text
-				else: continue
-			else:
-				title = title[0].text
-		else: continue
-		# CONTENT
-		content = traffic.select("pp-content-container, .text")
-		if len(content) > 0:
-			content = content[0].text.strip()
-		else: continue
-		# DATE
-		date = "promet.si"+traffic.get("promet-card-header-right-value-0")
+    try:
+        browser.get(url)
+        WebDriverWait(browser, TIMEOUT).until(ec.presence_of_element_located((By.CSS_SELECTOR, selector)))
+        html = browser.page_source
+        soup = BeautifulSoup(html, features="html.parser")
 
-		def decode(x):
-			return x.replace("\u00a0\u20ac", "eur").replace("\u0161", "s").replace("\u0160", "s").replace("\u010d", "c").replace("\u017e", "z")
+        content = soup.select(selector)
+        index = 0
+        for item in content:
+            item_html = str(item)
 
-		traffics.append({
-			"title": decode(title),
-			"content": decode(content),
-			"date": date
-			})
+            if item_html.startswith("<p><strong>"):
+                index += 1
+                sections.append({"title": item.string, "text": ""})
+            else:
+                sections[index - 1]["text"] += item.text
 
-	return traffics
+    except TimeoutException:
+        print("Timed out")
+    finally:
+        browser.quit()
 
-
-def get_new_traffic(traffics, refresh):
-	old_links = [traffic.get("link") for traffic in traffics]
-	new = []
-	
-	for ad in refresh:
-		if ad.get("link") not in old_links:
-			new.append(ad)
-
-	return new
-
-
-
-def print_traffics(traffics):
-	for traffic in traffics:
-		try:
-			print("Title: "+traffic.get("title"))
-			print("Content: "+traffic.get("content"))
-			print("Date:  "+traffic.get("date"))
-			print("\n")
-		except: 
-			pass
-
-
-def set_default(obj):
-	if isinstance(obj, set):
-		return list(obj)
+    return sections
 
 
 
 if __name__ == "__main__":
-	url = "https://www.promet.si/sl"
-	interval = 30
+    url = "https://www.rtvslo.si/stanje-na-cestah"
+    info = get_traffic_info(url)
 
-	# Initial traffics
-	traffics = get_all_traffic(url)
-
-	print("Number of initial traffic: "+str(len(traffics)))
-	print("New traffic since start: \n")
-	
-	try:
-		while True:
-			refresh_traffic = get_all_traffic(url)
-			new_traffic = get_new_traffic(traffics, refresh_traffic)
-
-			if len(new_traffic) > 0:
-				traffics = refresh_traffic
-				print_traffics(new_traffic)
-
-			time.sleep(interval)
-
-	except KeyboardInterrupt:
-		print("Exited loop\n\n")
-		print("All traffics collected: \n")
-		print(json.dumps(ads, indent=4, sort_keys=False, default=set_default))
-	except Exception as e:
-		print("Unknown exception: ")
-		print(e)
+    print(info)

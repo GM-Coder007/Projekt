@@ -1,23 +1,20 @@
+import { Point } from "geojson";
 import { Schema, model, Date } from "mongoose";
 
 export interface IRoadWorks {
-  long: number;
-  lat: number;
-  type: string;
-  description?: string;
+  title: string;
+  summary?: string;
   createdAt: Date;
+  updatedAt: Date;
 }
 
-const roadWorksSchema = new Schema<IRoadWorks>({
-  long: { type: Number, required: true },
-  lat: { type: Number, required: true },
-  type: { type: String, required: true },
-  description: { type: String },
-  createdAt: {
-    type: Date,
-    default: () => Date.now(),
+const roadWorksSchema = new Schema<IRoadWorks>(
+  {
+    title: { type: String, required: true },
+    summary: { type: String },
   },
-});
+  { timestamps: true }
+);
 
 const RoadWorks = model<IRoadWorks>("RoadWorks", roadWorksSchema);
 
