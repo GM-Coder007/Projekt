@@ -11,15 +11,18 @@ const FrontPage: React.FC = () => {
   const [sections, setSections] = useState<ISection[]>([]);
 
   const refreshDrives = () => {
-    fetch(getAPIEndpoint() + "/drives")
+    fetch(getAPIEndpoint() + "/roadquality")
       .then((res) => res.json())
       .then((result) => {
         setIsLoaded(true);
         let section: ISection[] = [];
-        section.push({
-          start: result[0].start.coordinates,
-          end: result[0].end.coordinates,
-          quality: 10,
+
+        result.forEach((drive: any) => {
+          section.push({
+            start: drive.start.coordinates,
+            end: drive.end.coordinates,
+            quality: drive.quality,
+          });
         });
         setSections(section);
       })

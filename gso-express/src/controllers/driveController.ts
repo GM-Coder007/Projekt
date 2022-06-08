@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import StatusCodes from "http-status-codes";
-import Drive from "../models/driveModel";
+import { CallbackError, HydratedDocument } from "mongoose";
+import Drive, { IDrive } from "../models/driveModel";
 import RawRoadQuality from "../models/rawRoadQualityModel";
 import RoadQuality from "../models/roadQualityModel";
 
@@ -16,15 +17,19 @@ const {
 } = StatusCodes;
 
 function driveGet(req: Request, res: Response) {
-  Drive.find(function (err, drive) {
-    if (err) {
-      return res.status(INTERNAL_SERVER_ERROR).json({
-        msg: "Server error.",
-      });
-    }
+  const user = req.user?.id;
+  if (!user) return res.status(UNAUTHORIZED).json({ msg: "No user found" });
+  Drive.find({ user })
+    .sort("-createdAt")
+    .exec(function (err, drive) {
+      if (err) {
+        return res.status(INTERNAL_SERVER_ERROR).json({
+          msg: "Server error.",
+        });
+      }
 
-    return res.json(drive);
-  });
+      return res.json(drive);
+    });
 }
 
 async function drivePost(req: Request, res: Response) {

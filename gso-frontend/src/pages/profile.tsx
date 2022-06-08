@@ -1,25 +1,16 @@
-import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Container,
-  CssBaseline,
-  TextField,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Avatar, Card, CardHeader, Container, Grid } from "@mui/material";
+import { red } from "@mui/material/colors";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/header";
 import { getAPIEndpoint } from "../variables";
 
 const ProfilePage: React.FC = () => {
   const [error, setError] = useState("");
 
-  const theme = useTheme();
   const navigate = useNavigate();
 
+  /*
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -48,65 +39,34 @@ const ProfilePage: React.FC = () => {
         setError(error);
       }
     });
-  };
+  };*/
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
+    <>
+      <Header />
+      <Grid
+        container
+        spacing={0}
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        style={{ minHeight: "90vh" }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          {error && (
-            <Alert sx={{ mt: 2 }} severity="error">
-              {error}
-            </Alert>
-          )}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Sign In
-          </Button>
-          <Link to="/register" style={{ color: theme.palette.primary.main }}>
-            Don't have an account? Sign Up
-          </Link>
-        </Box>
-      </Box>
-    </Container>
+        <Grid item xs={3}>
+          <Card>
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                  R
+                </Avatar>
+              }
+              title="Shrimp and Chorizo Paella"
+              subheader="September 14, 2016"
+            />
+          </Card>
+        </Grid>
+      </Grid>
+    </>
   );
 };
 

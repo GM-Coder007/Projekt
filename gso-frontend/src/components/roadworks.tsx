@@ -20,7 +20,8 @@ const Roadworks: React.FC = () => {
       const data = isJson ? await res.json() : null;
 
       if (res.ok) {
-        setRoadworks(data.roadworks);
+        if (data.roadworks && data.roadworks.length > 0)
+          setRoadworks(data.roadworks);
       } else {
         const error = (data && data.message) || res.status;
         setError(error);

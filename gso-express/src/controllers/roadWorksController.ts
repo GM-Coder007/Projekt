@@ -26,7 +26,17 @@ const {
     return res.json(roadWorks);
   });
 }*/
-function roadworksGet(req: Request, res: Response) {
+async function roadworksGet(req: Request, res: Response) {
+  let roadworks;
+  try {
+    roadworks = await RoadWorks.find().exec();
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+  if (roadworks.length > 0) return res.json(roadworks);
+
   axios
     .get(
       "https://www.promet.si/dc/b2b.dogodki.rss?language=sl_SI&eventtype=incidents"
@@ -39,7 +49,7 @@ function roadworksGet(req: Request, res: Response) {
           id: element.id[0],
           title: element.title[0],
           summary: element.summary[0],
-          type: element.category[0].$.term,
+          //type: element.category[0].$.term,
         });
       });
       return res.json({ roadworks: parsed });
@@ -52,11 +62,10 @@ function roadworksGet(req: Request, res: Response) {
 }
 
 function roadworksPost(req: Request, res: Response) {
-  const location: Point = req.body.location;
-  const type: string = req.body.type;
-  const description: string = req.body.description;
-
-  var roadWorks = new RoadWorks({ location, type, description });
+  var roadWorks = new RoadWorks({
+    title: req.body.title,
+    summary: req.body.summary,
+  });
 
   roadWorks.save(function (err, roadworks) {
     if (err) {

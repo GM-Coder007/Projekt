@@ -28,6 +28,7 @@ const QualityMap: React.FC<QualityMapProps> = ({ sections }) => {
           key={index}
           pathOptions={{ color: getColor(section.quality) }}
           positions={[section.start, section.end]}
+          weight={5}
         />
       ))}
     </MapContainer>

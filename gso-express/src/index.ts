@@ -31,7 +31,11 @@ mongoose.connect(mongoDB);
 
 const app: Express = express();
 
-const allowedOrigins = ["http://" + domain, "https://" + domain];
+const allowedOrigins = [
+  "http://" + domain,
+  "https://" + domain,
+  "http://localhost:3000",
+];
 //console.log(allowedOrigins);
 
 app.use(
