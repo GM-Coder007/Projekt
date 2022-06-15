@@ -1,0 +1,19 @@
+<uses-feature android:name="android.hardware.camera"
+                  android:required="true" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+   <activity
+            android:name=".PrijavaActivity"
+            android:exported="true" />
+        <activity
+            android:name=".RegistracijaActivity"
+            android:exported="true" />
+        <activity
+            android:name=".PrikazActivity"
+            android:exported="true" />
+        <activity
+            android:name=".AvtentifikacijaActivity"
+            android:exported="true" />
+        <activity
