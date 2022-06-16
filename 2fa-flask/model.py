@@ -1,6 +1,8 @@
 import os
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
+from skimage.feature import local_binary_pattern
+from skimage.feature import hog
 import cv2 as cv
 import pickle
 import numpy as np
@@ -13,6 +15,8 @@ from lbp import calcLBPHist
 pixels_per_cell = 8
 cells_per_image = 8
 limit = 1000
+
+useScikit = True
 
 
 def read_data(file):
@@ -28,13 +32,44 @@ def write_data(file, data):
     fd.close()
 
 
-def generateFeature(image):
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+def face_crop(gray):
+    cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+    # obrazi = detekcija.detectMultiScale(gray)
 
-    histLPB = calcLBPHist(gray, cells_per_image)
-    # histHOG = calcHOGHist(gray)
-    histHOG = izracunaj_hog_znacilnice(
-        gray, st_orientacij=9, piksli_celica=(8, 8), celice_blok=(1, 1))
+    faces = cascade.detectMultiScale(gray)
+
+    # crop first face
+    if len(faces) > 0:
+        print("Found " + str(len(faces)) + " faces")
+        x, y, w, h = faces[0]
+        return gray[y:y+h, x:x+w]
+    # rišemo kvadrate okoli najdenih obrazev v videu
+    # for (x, y, w, h) in obrazi:  # x,y predstavljata koordinati, w in h pa sirino in visino
+        # s pomočjo vgrajene funkcije rectangle in z parametri x,y,w,h narišemo kvadrat okoli obraza
+        # cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+    return None
+
+
+def generateFeature(gray):
+    image = cv.resize(
+        gray, (pixels_per_cell*cells_per_image, pixels_per_cell*cells_per_image))
+    # gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+    if useScikit:
+        lbp = local_binary_pattern(image, 24, 8, method="uniform")
+        n_bins = int(lbp.max() + 1)
+        hist, _ = np.histogram(
+            lbp, density=True, bins=n_bins, range=(0, n_bins))
+        histLPB = hist
+    else:
+        histLPB = calcLBPHist(image, cells_per_image)
+
+    if useScikit:
+        histHOG = hog(image)
+    else:
+        histHOG = izracunaj_hog_znacilnice(
+            image, st_orientacij=9, piksli_celica=(8, 8), celice_blok=(1, 1))
 
     return np.concatenate((histLPB, histHOG))
 
@@ -56,13 +91,11 @@ def images_to_train_data(imagesPath):
                 if image is None:
                     print("Can't read image: " + path)
                 else:
-                    imageRes = cv.resize(
-                        image, (pixels_per_cell*cells_per_image, pixels_per_cell*cells_per_image))
-
-                    feature = generateFeature(imageRes)
+                    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+                    feature = generateFeature(gray)
 
                     features.append(feature)
-                    labels.append(1)
+                    labels.append(0)
 
                     readCounter += 1
                     if limit != 0 and readCounter >= limit:
@@ -83,22 +116,28 @@ def video_to_train_data(video_path):
         readCounter = 0
         while(vid_capture.isOpened()):
             ret, frame = vid_capture.read()
-            if frame is None:
-                print("Can't read frame.")
+            print("Processing frame " + str(readCounter) +
+                  " of " + str(frame_count))
+            if not ret:
+                print("Can't read frame " + str(readCounter) +
+                      " of " + str(frame_count))
+                break
             else:
-                image = cv.resize(
-                    frame, (pixels_per_cell*cells_per_image, pixels_per_cell*cells_per_image))
+                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                cropped = face_crop(gray)
+                if cropped is not None:
+                    feature = generateFeature(cropped)
+                    #cv.imshow("cropped", cropped)
 
-                feature = generateFeature(image)
-
-                features.append(feature)
-                labels.append(0)
+                    features.append(feature)
+                    labels.append(1)
 
                 readCounter += 1
                 if limit != 0 and readCounter >= limit:
                     break
 
     vid_capture.release()
+    # cv.destroyAllWindows()
     return features, labels
 
 
@@ -118,7 +157,7 @@ def train(user_id):
     video_path = os.path.join("uploads", "videos", user_id + ".mp4")
     model_path = os.path.join("models", user_id + ".pickle")
 
-    features_train, labels_train = combineFeatures(video_path)
+    features, labels = combineFeatures(video_path)
     model = SVC()
     model.fit(features, labels)
     write_data(model_path, model)
@@ -133,7 +172,8 @@ def predict(user_id, imagePath):
     model_path = os.path.join("models", user_id + ".pickle")
 
     image = cv.imread(imagePath)
-    feature = generateFeature(image)
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    feature = generateFeature(gray)
 
     model = read_data(model_path)
     prediction = model.predict([feature])

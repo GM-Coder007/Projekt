@@ -64,7 +64,7 @@ def upload_file():
         filename = secure_filename(file.filename)
         file_name, file_extension = os.path.splitext(filename)
         full_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], "video", user_id + file_extension)
+            app.config['UPLOAD_FOLDER'], "videos", user_id + file_extension)
         file.save(full_path)
         # (url_for('download_file', name=filename))
         train(user_id)
@@ -84,7 +84,10 @@ def twofa():
 
     user_id = decoded['sub']
 
-    set_cookie = args.get("setCookie", default=False, type=bool)
+    set_cookie = request.args.get("setCookie", default=False, type=bool)
+
+    if not os.path.exists(os.path.join("models", user_id + ".pickle")):
+        return jsonify(msg="Model not trained"), 400
 
     # check if the post request has the file part
     if 'file' not in request.files:
@@ -98,13 +101,19 @@ def twofa():
         filename = secure_filename(file.filename)
         file_name, file_extension = os.path.splitext(filename)
         full_path = os.path.join(
-            app.config['UPLOAD_FOLDER'], "image", user_id, uuid.uuid4().hex + file_extension)
+            app.config['UPLOAD_FOLDER'], "images", user_id)
+
+        if not os.path.exists(full_path):
+            os.makedirs(full_path)
+
+        full_path = os.path.join(full_path, uuid.uuid4().hex + file_extension)
+
         file.save(full_path)
         # (url_for('download_file', name=filename))
         if predict(user_id, full_path):
             return send_token(user_id, set_cookie)
         else:
-            return jsonify(msg="Your face is not in the training set"), 403
+            return jsonify(msg="Your face was not recognized"), 403
     return jsonify(msg="File not allowed"), 400
 
 
