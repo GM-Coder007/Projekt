@@ -1,0 +1,12 @@
+FROM ubuntu
+MAINTAINER Skupina-GSO
+RUN apt-get update && apt-get install -y nodejs npm
+RUN npm install -g express
+RUN npm install -g typescript
+RUN npm install -g nodemon
+EXPOSE 3001 27017
+COPY . /gso-express/src
+WORKDIR /gso-express/src
+# CMD ["nodejs", "index.ts"]
+# CMD ["npm", "start"]
+CMD ["nodeamon", "index.ts"]

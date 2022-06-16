@@ -1,0 +1,7 @@
+__pycache__/
+venv/
+train/
+uploads/
+models/
+.env
+features.pickle
