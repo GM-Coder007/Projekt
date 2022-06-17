@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">GSO Road Condition</string>
+    <string name="registerButton">Register</string>
+    <string name="backButton">Back</string>
+    <string name="textPassword">Password</string>
+    <string name="textEmail">Email</string>
+    <string name="textConfirmPassword">Confirm password</string>
 </resources>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c5f67f6e-78d9-45c3-be4a-b019b888b4f0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gso.app/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../gso.app/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gso.app/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../gso.app/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gso.app/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../gso.app/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gso.app/app/src/main/java/net/gradic/gsoroadcondition/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../gso.app/app/src/main/java/net/gradic/gsoroadcondition/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gso.app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../gso.app/build.gradle" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="2AfVynhyZyE8xx4zwK5fudbauC8" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c5f67f6e-78d9-45c3-be4a-b019b888b4f0" name="Changes" comment="" />
+      <created>1655400883562</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1655400883562</updated>
+    </task>
+    <servers />
+  </component>
+</project>
