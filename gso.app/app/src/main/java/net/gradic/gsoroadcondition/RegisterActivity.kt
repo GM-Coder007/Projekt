@@ -2,12 +2,9 @@ package net.gradic.gsoroadcondition
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.gson.jsonBody
-import com.github.kittinunf.fuel.gson.responseObject
+import android.widget.Toast
 import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.result.Result;
-import net.gradic.gsoroadcondition.databinding.ActivityMainBinding
+import com.google.gson.Gson
 import net.gradic.gsoroadcondition.databinding.ActivityRegisterBinding
 
 class RegisterActivity : AppCompatActivity() {
@@ -20,28 +17,36 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-    fun register(view: android.view.View) {
-        val email = binding.editEmail.text
-        val password = binding.editPassword.text
-        binding.editConfirmPassword.text
+    data class RegisterModel(
+        val email: String,
+        val password: String
+    )
 
-        data class TokenModel(var token: String = "")
+    fun postData(email: String, password: String) {
+        val url = getString(R.string.serverURL) + "/users/register"
 
-        Fuel.post("http://192.168.2.12:4000/users/register").jsonBody("{ email: \"$email\", password: \"$password\"}")
-            .response { request, response, result ->
+        val gson = Gson()
+        val jsonString = gson.toJson(RegisterModel(email,password))
 
-                when (result) {
-                    is Result.Failure -> {
-                        val ex = result.getException()
-                        binding.textError.text = "${result.get()} $ex"
-                    }
-                    is Result.Success -> {
-                        val data = result.get()
-                        binding.textError.text = data.toString()
-                    }
-                }
+        url.httpPost().header(mapOf("Content-Type" to "application/json")).body(jsonString).responseString { request, response, result ->
+            if (response.statusCode == 201) {
+                Toast.makeText(this, "Successfully registered with $email", Toast.LENGTH_SHORT).show()
+                finish()
             }
+            else Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show()
+        }
     }
+
+    fun register(view: android.view.View) {
+        val email = binding.editEmail.text.toString()
+        val password = binding.editPassword.text.toString()
+        val confirmPassword = binding.editConfirmPassword.text.toString()
+
+        if (password != confirmPassword) binding.textError.text = "Passwords don't match"
+
+        postData(email, password)
+    }
+
     fun back(view: android.view.View) {
         finish();
     }

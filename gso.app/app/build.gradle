@@ -48,4 +48,9 @@ dependencies {
     implementation 'com.github.kittinunf.fuel:fuel-android:2.3.1'
     implementation 'com.github.kittinunf.fuel:fuel-gson:2.3.1'
     implementation 'com.google.code.gson:gson:2.9.0'
+    //implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+
+    // define any required OkHttp artifacts without version
+    //implementation("com.squareup.okhttp3:okhttp")
+    //implementation("com.squareup.okhttp3:logging-interceptor")
 }
