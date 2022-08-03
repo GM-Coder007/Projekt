@@ -79,7 +79,7 @@ const DashboardPage: React.FC = () => {
 
         <Container sx={{ mb: 4 }}>
           <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
-            Road conditions
+            Road conditions (recorded by me)
           </Typography>
 
           <QualityMap sections={sections} />

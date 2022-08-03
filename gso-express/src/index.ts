@@ -24,7 +24,7 @@ import { expressjwt } from "express-jwt";
 dotenv.config();
 
 const domain = process.env.CORS_DOMAIN || "localhost:3000";
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 const mongoDB = process.env.MONGO_STRING || "mongodb://localhost/projekt";
 
 mongoose.connect(mongoDB);

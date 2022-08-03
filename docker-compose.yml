@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  backend:
+    restart: unless-stopped
+    build: gso-express/.
+    environment:
+      - MONGO_STRING=${MONGO_STRING}
+      - CORS_DOMAIN=${CORS_DOMAIN}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - API_KEY=${API_KEY}
+    ports:
+      - 4000:4000
+
+  frontend:
+    restart: unless-stopped
+    build: gso-frontend/.
+    ports:
+      - 80:80
