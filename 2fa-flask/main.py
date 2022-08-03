@@ -129,3 +129,7 @@ def send_token(user_id, set_cookie=False):
         res.set_cookie('token', access_token, max_age=expire,
                        httponly=True, samesite='Strict', domain=COOKIE_DOMAIN)
     return res
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

@@ -9,10 +9,21 @@ services:
       - CORS_DOMAIN=${CORS_DOMAIN}
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+      - ACCESS_TOKEN_EXPIRE=${ACCESS_TOKEN_EXPIRE}
       - API_KEY=${API_KEY}
     ports:
       - 4000:4000
+
+  twofa:
+    restart: unless-stopped
+    build: 2fa-flask/.
+    environment:
+      - CORS_DOMAIN=${CORS_DOMAIN}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - ACCESS_TOKEN_EXPIRE=${ACCESS_TOKEN_EXPIRE}
+    ports:
+      - 5000:80
 
   frontend:
     restart: unless-stopped
