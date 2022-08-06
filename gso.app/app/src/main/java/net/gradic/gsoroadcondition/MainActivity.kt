@@ -3,17 +3,23 @@ package net.gradic.gsoroadcondition
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import com.github.kittinunf.fuel.gson.responseObject
+import com.github.kittinunf.fuel.httpPost
 import com.google.android.gms.location.*
+import com.google.gson.Gson
 import net.gradic.gsoroadcondition.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +30,14 @@ class MainActivity : AppCompatActivity() {
     private var locationRequest: LocationRequest
     private var locationCallback: LocationCallback
     private var activityResultLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var sharedPref: SharedPreferences;
+
+    private var driving = false;
+    private var driveId = ""
+
+    private var lastLocation: Location? = null
+
+    //private Queue<FloatArray(3)> shocks
 
     init {
         locationRequest = LocationRequest.create()
@@ -31,17 +45,15 @@ class MainActivity : AppCompatActivity() {
                 interval = 1000 //can be much higher
                 fastestInterval = 500
                 smallestDisplacement = 10f //10m
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                priority = Priority.PRIORITY_HIGH_ACCURACY
                 maxWaitTime = 1000
             }
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                for (location in locationResult.locations) {
-                    //updateLocation(location)
-                    binding.textView1.setText(location.latitude.toString())
-                    binding.textView2.setText(location.longitude.toString())
-                    binding.textView3.setText(location.altitude.toString())
-                }
+                val location = locationResult.locations[0]
+                //updateLocation(location)
+                binding.textView1.setText("Location: ${location.latitude}, ${location.longitude}")
+                lastLocation = location
             }
         }
 
@@ -85,7 +97,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun postDrive(email: String, password: String) {
+        if (checkLogin()) {
+            val url = getString(R.string.serverURL) + "/drive"
+
+            data class Drive(var _id: String)
+
+            url.httpPost().header(mapOf("Content-Type" to "application/json")).responseObject<Drive> { request, response, result ->
+                if (response.statusCode == 200) {
+                    driveId = result.component1()?._id ?: ""
+                }
+                else if (response.statusCode == 401) {
+                    logout()
+                    Toast.makeText(this, "Login expired - ${response.statusCode}", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    Toast.makeText(this, "Couldn't start drive - ${response.statusCode}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        else {
+            Toast.makeText(this, "You must be logged in to start a drive", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun postData(email: String, password: String) {
+        if (checkLogin() && driveId != "") {
+            val url = getString(R.string.serverURL) + "/users/register"
+
+            val gson = Gson()
+            val jsonString = gson.toJson(RegisterActivity.RegisterModel(email, password))
+
+            url.httpPost().header(mapOf("Content-Type" to "application/json")).body(jsonString)
+                .responseString { request, response, result ->
+                    if (response.statusCode == 201) {
+                        Toast.makeText(
+                            this,
+                            "Successfully registered with $email",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    } else Toast.makeText(
+                        this,
+                        "Failed to register - ${response.statusCode}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
+    }
+
     private fun startLocationUpdates() {
+        driving = true
+        binding.buttonDrive.text = getString(R.string.stopButton)
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -114,6 +177,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopLocationUpdates() {
+        driving = false
+        binding.buttonDrive.text = getString(R.string.startButton)
         fusedLocationClient.removeLocationUpdates(locationCallback)
         sensorManager.unregisterListener(accelerationListener)
     }
@@ -123,6 +188,9 @@ class MainActivity : AppCompatActivity() {
         //setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPref = getSharedPreferences("JWT", Context.MODE_PRIVATE)
+        checkLogin()
 
         val appPerms = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -139,16 +207,52 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        startLocationUpdates()
+        checkLogin()
+        //startLocationUpdates()
     }
 
     override fun onPause() {
         super.onPause()
-        stopLocationUpdates()
+        //stopLocationUpdates()
     }
 
-    fun openRegisterActivity(view: android.view.View) {
+    fun checkLogin(): Boolean {
+        val jwt = sharedPref.getString("JWT", "")
+
+        return if (jwt == "") {
+            binding.textView4.text = "Not logged in"
+            binding.buttonLogout.isEnabled = false
+            false
+        } else {
+            binding.textView4.text = jwt
+            binding.buttonLogout.isEnabled = true
+            true
+        }
+    }
+
+    fun openRegisterActivity() {
         val intent = Intent(this, RegisterActivity::class.java)
         startActivity(intent)
+    }
+
+    fun openLoginActivity() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun logout() {
+        with (sharedPref.edit()) {
+            putString("JWT", "")
+            apply()
+        }
+        checkLogin()
+    }
+
+    fun drive() {
+        if (driving) {
+            stopLocationUpdates()
+        } else if (checkLogin()) {
+                startLocationUpdates()
+        }
     }
 }

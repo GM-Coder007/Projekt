@@ -33,7 +33,7 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, "Successfully registered with $email", Toast.LENGTH_SHORT).show()
                 finish()
             }
-            else Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(this, "Failed to register - ${response.statusCode}", Toast.LENGTH_SHORT).show()
         }
     }
 
