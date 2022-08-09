@@ -3,10 +3,10 @@ import { Schema, model, Date, Types } from "mongoose";
 
 export interface IDrive {
   name?: string;
-  start?: Point;
+  /*start?: Point;
   end?: Point;
   averageSpeed?: number;
-  maxSpeed?: number;
+  maxSpeed?: number;*/
   user: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -15,7 +15,7 @@ export interface IDrive {
 const driveSchema = new Schema<IDrive>(
   {
     name: String,
-    start: {
+    /*start: {
       type: {
         type: String,
         enum: ["Point"],
@@ -38,7 +38,7 @@ const driveSchema = new Schema<IDrive>(
       },
     },
     averageSpeed: { type: Number },
-    maxSpeed: { type: Number },
+    maxSpeed: { type: Number },*/
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",

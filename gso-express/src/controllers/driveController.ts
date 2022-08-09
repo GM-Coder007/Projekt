@@ -38,10 +38,10 @@ async function drivePost(req: Request, res: Response) {
 
   var drive = new Drive();
   if (req.body.name) drive.name = req.body.name;
-  if (req.body.start) drive.start = req.body.start;
+  /*if (req.body.start) drive.start = req.body.start;
   if (req.body.end) drive.end = req.body.end;
   if (req.body.averageSpeed) drive.averageSpeed = req.body.averageSpeed;
-  if (req.body.maxSpeed) drive.maxSpeed = req.body.maxSpeed;
+  if (req.body.maxSpeed) drive.maxSpeed = req.body.maxSpeed;*/
   drive.user = user;
 
   try {
@@ -82,12 +82,12 @@ async function drivePut(req: Request, res: Response) {
       .json({ msg: "You don't have access to this resource" });
 
   drive.name = req.body.name ? req.body.name : drive.name;
-  drive.start = req.body.start ? req.body.start : drive.start;
+  /*drive.start = req.body.start ? req.body.start : drive.start;
   drive.end = req.body.end ? req.body.end : drive.end;
   drive.averageSpeed = req.body.averageSpeed
     ? req.body.averageSpeed
     : drive.averageSpeed;
-  drive.maxSpeed = req.body.maxSpeed ? req.body.maxSpeed : drive.maxSpeed;
+  drive.maxSpeed = req.body.maxSpeed ? req.body.maxSpeed : drive.maxSpeed;*/
 
   try {
     await drive.save();

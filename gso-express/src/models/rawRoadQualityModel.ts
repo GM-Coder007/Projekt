@@ -5,7 +5,7 @@ export interface IRawRoadQuality {
   start: Point;
   end: Point;
   measurements: [[number, number, number]];
-  speed: number;
+  //speed: number;
   user: Types.ObjectId;
   drive: Types.ObjectId;
   createdAt: Date;
@@ -37,7 +37,7 @@ const rawRoadQualitySchema = new Schema<IRawRoadQuality>(
       },
     },
     measurements: { type: [[Number, Number, Number]], required: true },
-    speed: { type: Number, required: true },
+    //speed: { type: Number, required: true },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
