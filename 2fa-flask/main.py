@@ -124,7 +124,7 @@ def send_token(user_id, set_cookie=False):
     expire = timestamp + int(ACCESS_TOKEN_EXPIRE)
     access_token = jwt.encode(
         {"sub": user_id, "twofa": True, "iat": timestamp, "exp": expire}, ACCESS_TOKEN_SECRET, algorithm="HS256")
-    res = jsonify(token=access_token)
+    res = jsonify(token=access_token, twofa=True)
     if set_cookie:
         res.set_cookie('token', access_token, max_age=expire,
                        httponly=True, samesite='Strict', domain=COOKIE_DOMAIN)

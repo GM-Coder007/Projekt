@@ -80,7 +80,7 @@ async function login(req: Request, res: Response) {
           sameSite: "strict",
         });
       }
-      return res.json({ token });
+      return res.json({ token, twofa: user.twofa });
     }
   });
 }

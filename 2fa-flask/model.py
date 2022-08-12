@@ -17,6 +17,7 @@ cells_per_image = 8
 limit = 1000
 
 useScikit = True
+faceCrop = False
 
 
 def read_data(file):
@@ -124,7 +125,7 @@ def video_to_train_data(video_path):
                 break
             else:
                 gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-                cropped = face_crop(gray)
+                cropped = face_crop(gray) if faceCrop else gray
                 if cropped is not None:
                     feature = generateFeature(cropped)
                     #cv.imshow("cropped", cropped)
