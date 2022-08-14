@@ -30,9 +30,14 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 # app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
 # jwt = JWTManager(app)
 
+folders_created = False
+
 
 def decode_jwt(token):
-    return jwt.decode(token, ACCESS_TOKEN_SECRET, algorithms=["HS256"])
+    try:
+        return jwt.decode(token, ACCESS_TOKEN_SECRET, algorithms=["HS256"])
+    except:
+        return None
 
 
 def allowed_file(filename, extensions):
@@ -42,6 +47,8 @@ def allowed_file(filename, extensions):
 
 @app.route('/video', methods=['POST'])
 def upload_file():
+    if not folders_created:
+        create_folders()
     token = request.cookies.get('token')
     if not token:
         return jsonify({'msg': 'No token'}), 403
@@ -74,6 +81,8 @@ def upload_file():
 
 @app.route('/twofa', methods=['POST'])
 def twofa():
+    if not folders_created:
+        create_folders()
     token = request.cookies.get('token')
     if not token:
         return jsonify({'msg': 'No token'}), 403
@@ -129,6 +138,16 @@ def send_token(user_id, set_cookie=False):
         res.set_cookie('token', access_token, max_age=expire,
                        httponly=True, samesite='Strict', domain=COOKIE_DOMAIN)
     return res
+
+
+def create_folders():
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, "images")):
+        os.makedirs(os.path.join(UPLOAD_FOLDER, "images"))
+    if not os.path.exists(os.path.join(UPLOAD_FOLDER, "videos")):
+        os.makedirs(os.path.join(UPLOAD_FOLDER, "videos"))
+    if not os.path.exists("models"):
+        os.makedirs("models")
+    folders_created = True
 
 
 if __name__ == "__main__":
