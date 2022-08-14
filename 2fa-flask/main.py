@@ -54,7 +54,7 @@ def upload_file():
     if not token:
         token = request.cookies.get('token')
     else:
-        token = token.split(' ')[1]
+        token = token.split(' ')
         if len(token) == 2:
             token = token[1]
         else:
@@ -98,7 +98,7 @@ def twofa():
     if not token:
         token = request.cookies.get('token')
     else:
-        token = token.split(' ')[1]
+        token = token.split(' ')
         if len(token) == 2:
             token = token[1]
         else:
