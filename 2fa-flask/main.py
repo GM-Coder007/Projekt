@@ -50,11 +50,15 @@ def upload_file():
     if not folders_created:
         create_folders()
 
-    token = request.headers.get('Authorization').split(' ')
-    if len(token) == 2:
-        token = token[1]
-    else:
+    token = request.headers.get('Authorization')
+    if not token:
         token = request.cookies.get('token')
+    else:
+        token = token.split(' ')[1]
+        if len(token) == 2:
+            token = token[1]
+        else:
+            token = request.cookies.get('token')
 
     if not token:
         return jsonify({'msg': 'No token'}), 403
@@ -90,11 +94,15 @@ def twofa():
     if not folders_created:
         create_folders()
 
-    token = request.headers.get('Authorization').split(' ')
-    if len(token) == 2:
-        token = token[1]
-    else:
+    token = request.headers.get('Authorization')
+    if not token:
         token = request.cookies.get('token')
+    else:
+        token = token.split(' ')[1]
+        if len(token) == 2:
+            token = token[1]
+        else:
+            token = request.cookies.get('token')
 
     if not token:
         return jsonify({'msg': 'No token'}), 403
