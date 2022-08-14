@@ -9,12 +9,15 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.BlobDataPart
+import com.github.kittinunf.fuel.core.FileDataPart
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpUpload
 import com.google.gson.Gson
 import net.gradic.gsoroadcondition.databinding.ActivityLoginBinding
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
@@ -93,7 +96,10 @@ class LoginActivity : AppCompatActivity() {
         val stream = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.JPEG, 50, stream)
 
-        url2.httpPost().header(mapOf("Content-Type" to "application/json", "Authorization" to "Bearer $token")).body(stream.toByteArray()).responseObject<Token> { request, response, result ->
+        val inStream = ByteArrayInputStream(stream.toByteArray())
+
+        url2.httpUpload().add(BlobDataPart(inStream, name = "file", filename="image.jpg", contentType = "image/jpeg")).header(mapOf("Authorization" to "Bearer $token"))
+            .body(stream.toByteArray()).responseObject<Token> { request, response, result ->
             if (response.statusCode == 200 ) {
                 var token = result.component1()?.token ?: "";
 

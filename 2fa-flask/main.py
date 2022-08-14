@@ -49,7 +49,13 @@ def allowed_file(filename, extensions):
 def upload_file():
     if not folders_created:
         create_folders()
-    token = request.cookies.get('token')
+
+    token = request.headers.get('Authorization').split(' ')
+    if len(token) == 2:
+        token = token[1]
+    else:
+        token = request.cookies.get('token')
+
     if not token:
         return jsonify({'msg': 'No token'}), 403
 
@@ -83,7 +89,13 @@ def upload_file():
 def twofa():
     if not folders_created:
         create_folders()
-    token = request.cookies.get('token')
+
+    token = request.headers.get('Authorization').split(' ')
+    if len(token) == 2:
+        token = token[1]
+    else:
+        token = request.cookies.get('token')
+
     if not token:
         return jsonify({'msg': 'No token'}), 403
 
