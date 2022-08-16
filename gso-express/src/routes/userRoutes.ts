@@ -13,6 +13,7 @@ router.post(
   body("email").isEmail().normalizeEmail(),
   body("password").isString().not().isEmpty(),
   query("setCookie").default(false).isBoolean(),
+  query("react").default(false).isBoolean(),
   userController.login
 );
 router.post(

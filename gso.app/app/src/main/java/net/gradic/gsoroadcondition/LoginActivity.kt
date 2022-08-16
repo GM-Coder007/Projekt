@@ -98,8 +98,9 @@ class LoginActivity : AppCompatActivity() {
 
         val inStream = ByteArrayInputStream(stream.toByteArray())
 
-        url2.httpUpload().add(BlobDataPart(inStream, name = "file", filename="image.jpg", contentType = "image/jpeg")).header(mapOf("Authorization" to "Bearer $token"))
-            .body(stream.toByteArray()).responseObject<Token> { request, response, result ->
+        url2.httpUpload().add(BlobDataPart(inStream, name = "file", filename="image.jpg", contentType = "image/jpeg", contentLength = stream.size().toLong()))
+            .header(mapOf("Authorization" to "Bearer $token"))
+            .responseObject<Token> { request, response, result ->
             if (response.statusCode == 200 ) {
                 var token = result.component1()?.token ?: "";
 

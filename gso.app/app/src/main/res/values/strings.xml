@@ -9,6 +9,6 @@
     <string name="textPassword">Password</string>
     <string name="textEmail">Email</string>
     <string name="textConfirmPassword">Confirm password</string>
-    <string name="serverURL">http://192.168.2.10:4000</string>
-    <string name="twofaURL">http://192.168.2.13:5000</string>
+    <string name="serverURL">http://gso.gradic.net:4000</string>
+    <string name="twofaURL">http://gso.gradic.net:5000</string>
 </resources>

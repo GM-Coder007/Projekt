@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
       password: data.get("password"),
     };
 
-    fetch(getAPIEndpoint() + "/users/login?setCookie=true", {
+    fetch(getAPIEndpoint() + "/users/login?setCookie=true&react=true", {
       method: "POST",
       credentials: "include",
       headers: {

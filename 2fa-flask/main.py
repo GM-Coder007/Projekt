@@ -1,5 +1,6 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, jsonify, Response
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import jwt
 import time
@@ -25,6 +26,7 @@ ACCESS_TOKEN_EXPIRE = os.getenv('ACCESS_TOKEN_EXPIRE')
 COOKIE_DOMAIN = os.getenv('COOKIE_DOMAIN')
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 # app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
@@ -82,6 +84,10 @@ def upload_file():
         file_name, file_extension = os.path.splitext(filename)
         full_path = os.path.join(
             app.config['UPLOAD_FOLDER'], "videos", user_id + file_extension)
+
+        delete_model(user_id)
+        delete_video(user_id)
+
         file.save(full_path)
         # (url_for('download_file', name=filename))
         train(user_id)
@@ -116,15 +122,18 @@ def twofa():
     set_cookie = request.args.get("setCookie", default=False, type=bool)
 
     if not os.path.exists(os.path.join("models", user_id + ".pickle")):
+        print("Model not found")
         return jsonify(msg="Model not trained"), 400
 
     # check if the post request has the file part
     if 'file' not in request.files:
+        print("No file part")
         return jsonify(msg="No file part"), 400
     file = request.files['file']
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
     if file.filename == '':
+        print("No selected file")
         return jsonify(msg="No selected file"), 400
     if file and allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
         filename = secure_filename(file.filename)
@@ -143,6 +152,7 @@ def twofa():
             return send_token(user_id, set_cookie)
         else:
             return jsonify(msg="Your face was not recognized"), 403
+    print("File not allowed")
     return jsonify(msg="File not allowed"), 400
 
 
@@ -168,6 +178,18 @@ def create_folders():
     if not os.path.exists("models"):
         os.makedirs("models")
     folders_created = True
+
+
+def delete_video(user_id):
+    full_path = os.path.join(UPLOAD_FOLDER, "videos", user_id + ".mp4")
+    if os.path.exists(full_path):
+        os.remove(full_path)
+
+
+def delete_model(user_id):
+    full_path = os.path.join("models", user_id + ".pickle")
+    if os.path.exists(full_path):
+        os.remove(full_path)
 
 
 if __name__ == "__main__":

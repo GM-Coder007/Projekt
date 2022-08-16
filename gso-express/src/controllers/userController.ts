@@ -52,6 +52,9 @@ async function login(req: Request, res: Response) {
   const email: string = req.body.email;
   const password: string = req.body.password;
 
+  let twofa = false;
+  if (req.query.react === "true" || req.query.react === "1") twofa = true;
+
   User.authenticate(email, password, function (error, user) {
     if (error) {
       return res.status(INTERNAL_SERVER_ERROR).json({
@@ -69,7 +72,7 @@ async function login(req: Request, res: Response) {
         return res
           .status(INTERNAL_SERVER_ERROR)
           .json({ msg: "No configured secret" });
-      const token = sign({ sub: user._id, twofa: user.twofa }, secret, {
+      const token = sign({ sub: user._id, twofa }, secret, {
         expiresIn: expire,
       });
       if (req.query.setCookie === "true" || req.query.setCookie === "1") {

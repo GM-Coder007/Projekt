@@ -6,7 +6,6 @@ services:
     build: gso-express/.
     environment:
       - MONGO_STRING=${MONGO_STRING}
-      - CORS_DOMAIN=${CORS_DOMAIN}
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - ACCESS_TOKEN_EXPIRE=${ACCESS_TOKEN_EXPIRE}
@@ -18,10 +17,12 @@ services:
     restart: unless-stopped
     build: 2fa-flask/.
     environment:
-      - CORS_DOMAIN=${CORS_DOMAIN}
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - ACCESS_TOKEN_EXPIRE=${ACCESS_TOKEN_EXPIRE}
+    volumes:
+      - uploads:/app/uploads
+      - models:/app/models
     ports:
       - 5000:80
 
@@ -30,3 +31,7 @@ services:
     build: gso-frontend/.
     ports:
       - 80:80
+
+volumes:
+  uploads:
+  models:

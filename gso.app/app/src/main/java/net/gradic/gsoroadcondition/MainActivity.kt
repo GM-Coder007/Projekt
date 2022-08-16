@@ -1,6 +1,7 @@
 package net.gradic.gsoroadcondition
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,11 +13,14 @@ import android.hardware.SensorManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import com.github.kittinunf.fuel.core.extensions.authentication
 import com.github.kittinunf.fuel.gson.responseObject
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.google.android.gms.location.*
 import com.google.gson.Gson
@@ -28,7 +32,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sensorManager: SensorManager
-    private lateinit var accelerationListener: SensorEventListener
+    private var accelerationListener: SensorEventListener
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationRequest: LocationRequest
     private var locationCallback: LocationCallback
@@ -49,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             .apply { //https://stackoverflow.com/questions/66489605/is-constructor-locationrequest-deprecated-in-google-maps-v2
                 interval = 1000 //can be much higher
                 fastestInterval = 500
-                smallestDisplacement = 1f //10m
+                smallestDisplacement = 10f //10m
                 priority = Priority.PRIORITY_HIGH_ACCURACY
                 maxWaitTime = 1000
             }
@@ -152,7 +156,7 @@ class MainActivity : AppCompatActivity() {
             url.httpPost().header(mapOf("Content-Type" to "application/json", "Authorization" to "Bearer $jwt")).body(jsonString)
                 .responseString { request, response, result ->
                     if (response.statusCode == 201) {
-                        binding.textView2.text = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                        binding.textView2.text = "Latest update: ${DateTimeFormatter.ISO_INSTANT.format(Instant.now())}"
                     } else {
                         Toast.makeText(this, "Failed to submit data - ${response.statusCode}", Toast.LENGTH_SHORT).show()
                     }
@@ -205,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         sharedPref = getSharedPreferences("JWT", Context.MODE_PRIVATE)
-        checkLogin()
+        if(checkLogin()) getProfile()
 
         val appPerms = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -222,7 +226,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        checkLogin()
+        if(checkLogin()) getProfile()
         //startLocationUpdates()
     }
 
@@ -240,7 +244,7 @@ class MainActivity : AppCompatActivity() {
             binding.buttonLogout.isEnabled = false
             false
         } else {
-            binding.textView4.text = jwtPref
+            //binding.textView4.text = jwtPref
             jwt = jwtPref!!
             binding.buttonLogout.isEnabled = true
             true
@@ -274,6 +278,21 @@ class MainActivity : AppCompatActivity() {
             stopLocationUpdates()
         } else if (checkLogin()) {
             startLocationUpdates()
+        }
+    }
+
+    fun getProfile() {
+        data class Profile(var _id: String, var email: String, var twofa: Boolean)
+
+        val url = getString(R.string.serverURL) + "/users/profile"
+        url.httpGet().authentication().bearer(jwt).responseObject<Profile> { request, response, result ->
+            if (response.statusCode == 200 ) {
+                val id = result.component1()?._id ?: "";
+                val email = result.component1()?.email ?: "";
+                val twofa = result.component1()?.twofa ?: false
+
+                binding.textView4.text = "$email ($id) - 2FA: $twofa"
+            }
         }
     }
 }

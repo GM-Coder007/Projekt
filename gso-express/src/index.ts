@@ -5,7 +5,7 @@ import express, {
   Response,
   Errback,
 } from "express";
-import cors from "cors";
+//import cors from "cors";
 import mongoose, { HydratedDocument } from "mongoose";
 //import session from "express-session";
 //import MongoStore from "connect-mongo";
@@ -23,7 +23,7 @@ import { expressjwt } from "express-jwt";
 
 dotenv.config();
 
-const domain = process.env.CORS_DOMAIN || "localhost:3000";
+//const domain = process.env.CORS_DOMAIN || "localhost:3000";
 const port = process.env.PORT || 4000;
 const mongoDB = process.env.MONGO_STRING || "mongodb://localhost/projekt";
 
@@ -31,12 +31,11 @@ mongoose.connect(mongoDB);
 
 const app: Express = express();
 
-const allowedOrigins = [
+/*const allowedOrigins = [
   "http://" + domain,
   "https://" + domain,
   "http://localhost:3000",
 ];
-//console.log(allowedOrigins);
 
 app.use(
   cors({
@@ -52,7 +51,15 @@ app.use(
       return callback(null, true);
     },
   })
-);
+);*/
+
+app.use(function (req: Request, res: Response, next: NextFunction) {
+  if (req.headers.origin) {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
+  next();
+});
 
 /*declare module "express-session" {
   interface SessionData {

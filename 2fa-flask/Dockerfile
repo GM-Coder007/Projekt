@@ -12,4 +12,5 @@ RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+RUN wget https://eu2.contabostorage.com/ebc70e4841ef4bcda057018f599e3452:gradic/train.zip && unzip train.zip
 COPY . .
