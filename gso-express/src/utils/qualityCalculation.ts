@@ -8,7 +8,7 @@ const qualityTresholds = [
   [14, 14, 14],
   [16, 16, 16],
   [18, 18, 18],
-  [20, 20, 20],
+  //[20, 20, 20],
 ];
 
 export function calculateQuality(
