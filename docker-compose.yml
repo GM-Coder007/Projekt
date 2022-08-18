@@ -29,6 +29,9 @@ services:
   frontend:
     restart: unless-stopped
     build: gso-frontend/.
+    environment:
+      - API_ENDPOINT=${API_ENDPOINT}
+      - TWO_FA_ENDPOINT=${TWO_FA_ENDPOINT}
     ports:
       - 80:80
 
