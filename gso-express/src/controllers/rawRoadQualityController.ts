@@ -70,5 +70,4 @@ async function rawroadqualityPost(req: Request, res: Response) {
 export default {
   rawroadqualityGet,
   rawroadqualityPost,
-  calculateQuality,
 } as const;

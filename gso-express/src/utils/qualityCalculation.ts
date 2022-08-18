@@ -1,14 +1,14 @@
 const qualityTresholds = [
-  [1, 1, 1],
   [2, 2, 2],
-  [3, 3, 3],
   [4, 4, 4],
-  [5, 5, 5],
   [6, 6, 6],
-  [7, 7, 7],
   [8, 8, 8],
-  [9, 9, 9],
   [10, 10, 10],
+  [12, 12, 12],
+  [14, 14, 14],
+  [16, 16, 16],
+  [18, 18, 18],
+  [20, 20, 20],
 ];
 
 export function calculateQuality(
@@ -22,10 +22,9 @@ export function calculateQuality(
       measurements[0][1] >= treshold[1] ||
       measurements[0][2] >= treshold[2]
     ) {
-      quality++;
-      console.log;
+      quality--;
     }
   });
 
-  return quality;
+  return 10 + quality;
 }

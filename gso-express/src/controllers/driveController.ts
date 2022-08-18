@@ -154,22 +154,28 @@ async function driveRecalculate(req: Request, res: Response) {
       msg: "Server error.",
     });
   }
-
-  quality.forEach(async (quality) => {
+  let success = true;
+  quality.every(async (quality) => {
     const roadQuality = new RoadQuality();
     roadQuality.drive = quality.drive;
+    roadQuality.start = quality.start;
+    roadQuality.end = quality.end;
     roadQuality.quality = calculateQuality(quality.measurements);
     //roadQuality.createdAt = quality.createdAt;
     //roadQuality.updatedAt = quality.updatedAt;
     roadQuality.user = quality.user;
+
     try {
       await roadQuality.save();
     } catch (err) {
-      return res.status(INTERNAL_SERVER_ERROR).json({
+      res.status(INTERNAL_SERVER_ERROR).json({
         msg: "Server error.",
       });
+      success = false;
+      return false;
     }
   });
+  if (success) return res.status(OK).json({ msg: "Recalculated" });
 }
 
 export default {
