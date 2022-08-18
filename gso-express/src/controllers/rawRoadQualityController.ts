@@ -33,7 +33,10 @@ async function rawroadqualityPost(req: Request, res: Response) {
 
   const start: Point = req.body.start;
   const end: Point = req.body.end;
-  const measurements: [[number, number, number]] = req.body.measurements;
+  const measurement: [number, number, number] = req.body.measurements;
+
+  // fix array
+  const measurements: [[number, number, number]] = [measurement];
   const drive: string = req.body.drive;
   //const speed: number = req.body.speed;
   const rawRoadQuality = new RawRoadQuality({
