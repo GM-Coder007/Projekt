@@ -10,7 +10,6 @@ export default function apiMiddleware(
 ) {
   const authHeader = req.headers.authorization;
   const key = authHeader && authHeader.split(" ")[1];
-
   if (key && key === process.env.API_KEY) {
     req.machine = true;
   }

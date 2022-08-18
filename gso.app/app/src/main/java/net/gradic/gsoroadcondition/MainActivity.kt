@@ -43,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var activityResultLauncher: ActivityResultLauncher<Array<String>>
 
+    private lateinit var sensorSettings: SensorSettings
 
     private var driving = false;
     private var driveId = ""
@@ -126,11 +127,11 @@ class MainActivity : AppCompatActivity() {
     fun initialize() {
         locationRequest = LocationRequest.create()
             .apply { //https://stackoverflow.com/questions/66489605/is-constructor-locationrequest-deprecated-in-google-maps-v2
-                interval = 1000 //can be much higher
-                fastestInterval = 500
-                smallestDisplacement = 10f //10m
-                priority = Priority.PRIORITY_HIGH_ACCURACY
-                maxWaitTime = 1000
+                interval = sensorSettings.interval //1000
+                fastestInterval = sensorSettings.fastestInterval
+                smallestDisplacement = sensorSettings.smallestDisplacement
+                priority = sensorSettings.priority
+                maxWaitTime = sensorSettings.maxWaitTime
             }
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -283,9 +284,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initialize()
-
         sharedPref = getSharedPreferences("JWT", Context.MODE_PRIVATE)
+        getSettings(true)
+        initialize()
         if(checkLogin()) getProfile()
 
         val appPerms = arrayOf(
@@ -373,7 +374,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    data class SensorSettings(var interval: Int, var fastestInterval: Int, var smallestDisplacement: Float, var priority: Int, var maxWaitTime: Int)
+    data class SensorSettings(var interval: Long, var fastestInterval: Long, var smallestDisplacement: Float, var priority: Int, var maxWaitTime: Long)
 
     fun getSettings(update: Boolean = false) {
         var interval = sharedPref.getString("interval", "")
@@ -382,15 +383,48 @@ class MainActivity : AppCompatActivity() {
         var priority = sharedPref.getString("priority", "")
         var maxWaitTime = sharedPref.getString("maxWaitTime", "")
 
-        val test = SensorSettings(interval = interval?.toIntOrNull() ?: 1000, fastestInterval = fastestInterval?.toIntOrNull() ?: 500, smallestDisplacement = smallestDisplacement?.toFloatOrNull() ?: 25f, priority = priority?.toIntOrNull() ?: Priority.PRIORITY_BALANCED_POWER_ACCURACY, maxWaitTime = maxWaitTime?.toIntOrNull() ?: 1000)
+        sensorSettings = SensorSettings(interval = interval?.toLongOrNull() ?: 1000, fastestInterval = fastestInterval?.toLongOrNull() ?: 500, smallestDisplacement = smallestDisplacement?.toFloatOrNull() ?: 25f, priority = priority?.toIntOrNull() ?: Priority.PRIORITY_BALANCED_POWER_ACCURACY, maxWaitTime = maxWaitTime?.toLongOrNull() ?: 1000)
 
-        data class Setting(var _id: String, var value: String)
-        data class Settings(var settings: ArrayList<Setting>)
+        var priorityText = when (sensorSettings.priority) {
+            Priority.PRIORITY_HIGH_ACCURACY -> "PRIORITY_HIGH_ACCURACY"
+            Priority.PRIORITY_BALANCED_POWER_ACCURACY -> "PRIORITY_BALANCED_POWER_ACCURACY"
+            Priority.PRIORITY_PASSIVE -> "PRIORITY_PASSIVE"
+            Priority.PRIORITY_LOW_POWER -> "PRIORITY_LOW_POWER"
+            else -> "Not set"
+        }
+        binding.textView3.text = "interval: ${sensorSettings.interval}\nfastestInterval: ${sensorSettings.fastestInterval}\nsmallestDisplacement: ${sensorSettings.smallestDisplacement}\npriority: ${priorityText}\nmaxWaitTime: ${sensorSettings.maxWaitTime}"
 
-        val url = getString(R.string.serverURL) + "/settings"
-        url.httpGet().responseObject<Settings> { request, response, result ->
-            if (response.statusCode == 200 ) {
-                val settings = result.component1()?.settings
+        if (update) {
+            data class Setting(var _id: String, var value: String)
+            data class Settings(var settings: ArrayList<Setting>)
+
+            val url = getString(R.string.serverURL) + "/settings"
+            url.httpGet().responseObject<Settings> { request, response, result ->
+                if (response.statusCode == 200) {
+                    val settings = result.component1()?.settings
+                    settings?.forEach { setting ->
+                        when (setting._id) {
+                            "interval" -> interval = setting.value
+                            "fastestInterval" -> fastestInterval = setting.value
+                            "smallestDisplacement" -> smallestDisplacement = setting.value
+                            "priority" -> priority = when (setting.value.toIntOrNull()) {
+                                Priority.PRIORITY_HIGH_ACCURACY -> Priority.PRIORITY_HIGH_ACCURACY.toString()
+                                Priority.PRIORITY_PASSIVE -> Priority.PRIORITY_PASSIVE.toString()
+                                Priority.PRIORITY_LOW_POWER -> Priority.PRIORITY_LOW_POWER.toString()
+                                else -> Priority.PRIORITY_BALANCED_POWER_ACCURACY.toString()
+                            }
+                            "maxWaitTime" -> maxWaitTime = setting.value
+                        }
+                    }
+                    with(sharedPref.edit()) {
+                        putString("interval", interval)
+                        putString("fastestInterval", fastestInterval)
+                        putString("smallestDisplacement", smallestDisplacement)
+                        putString("priority", priority)
+                        putString("maxWaitTime", maxWaitTime)
+                        apply()
+                    }
+                }
             }
         }
     }

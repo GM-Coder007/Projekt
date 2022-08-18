@@ -9,7 +9,6 @@ export default async function denyMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  if (!req.user)
-    return res.status(UNAUTHORIZED).json({ message: "Unauthorized" });
-  else return next();
+  if (req.user || req.machine) return next();
+  else return res.status(UNAUTHORIZED).json({ message: "Unauthorized" });
 }
