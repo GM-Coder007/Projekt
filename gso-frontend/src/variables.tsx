@@ -1,7 +1,7 @@
 export function getAPIEndpoint() {
-  return process.env.API_ENDPOINT || "http://gso.gradic.net:4000";
+  return process.env.API_ENDPOINT || "https://api-gso.gradic.net";
 }
 
 export function get2FAEndpoint() {
-  return process.env.TWO_FA_ENDPOINT || "http://gso.gradic.net:5000";
+  return process.env.TWO_FA_ENDPOINT || "https://twofa-gso.gradic.net";
 }
