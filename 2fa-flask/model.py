@@ -16,7 +16,7 @@ pixels_per_cell = 8
 cells_per_image = 8
 limit = 1000
 
-useScikit = True
+useScikit = False
 faceCrop = False
 
 
