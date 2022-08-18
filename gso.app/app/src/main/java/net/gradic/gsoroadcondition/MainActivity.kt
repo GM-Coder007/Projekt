@@ -31,13 +31,18 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var sharedPref: SharedPreferences;
     private lateinit var sensorManager: SensorManager
-    private var accelerationListener: SensorEventListener
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    /*private var accelerationListener: SensorEventListener
     private var locationRequest: LocationRequest
     private var locationCallback: LocationCallback
-    private var activityResultLauncher: ActivityResultLauncher<Array<String>>
-    private lateinit var sharedPref: SharedPreferences;
+    private var activityResultLauncher: ActivityResultLauncher<Array<String>>*/
+    private lateinit var accelerationListener: SensorEventListener
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var activityResultLauncher: ActivityResultLauncher<Array<String>>
+
 
     private var driving = false;
     private var driveId = ""
@@ -48,7 +53,77 @@ class MainActivity : AppCompatActivity() {
 
     private var jwt = ""
 
-    init {
+    /*init {
+        locationRequest = LocationRequest.create()
+            .apply { //https://stackoverflow.com/questions/66489605/is-constructor-locationrequest-deprecated-in-google-maps-v2
+                interval = 1000 //can be much higher
+                fastestInterval = 500
+                smallestDisplacement = 10f //10m
+                priority = Priority.PRIORITY_HIGH_ACCURACY
+                maxWaitTime = 1000
+            }
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                val location = locationResult.locations[0]
+                //updateLocation(location)
+                binding.textView1.setText("Location: ${location.latitude}, ${location.longitude}")
+
+                if (lastLocation != null) {
+                    postData(location)
+                    shocks[0] = 0.0f
+                    shocks[1] = 0.0f
+                    shocks[2] = 0.0f
+                }
+
+                lastLocation = location
+            }
+        }
+
+        accelerationListener = object : SensorEventListener {
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+                // Not in use
+            }
+
+            override fun onSensorChanged(event: SensorEvent) {
+                val gravity = FloatArray(3)
+                val linearAcceleration = FloatArray(3)
+                val alpha: Float = 0.8f
+
+                // Isolate the force of gravity with the low-pass filter.
+                gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]
+                gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1]
+                gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2]
+
+                // Remove the gravity contribution with the high-pass filter.
+                linearAcceleration[0] = event.values[0] - gravity[0]
+                linearAcceleration[1] = event.values[1] - gravity[1]
+                linearAcceleration[2] = event.values[2] - gravity[2]
+
+                //binding.textView1.setText(linear_acceleration[0].toString())
+                //binding.textView2.setText(linear_acceleration[1].toString())
+                //binding.textView3.setText(linear_acceleration[2].toString())
+
+                if (shocks[0] < linearAcceleration[0]) shocks[0] = linearAcceleration[0]
+                if (shocks[1] < linearAcceleration[1]) shocks[1] = linearAcceleration[1]
+                if (shocks[2] < linearAcceleration[2]) shocks[2] = linearAcceleration[2]
+            }
+        }
+
+        this.activityResultLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { result ->
+            var allAreGranted = true
+            for (permission in result.values) {
+                allAreGranted = allAreGranted && permission
+            }
+
+            /*if (allAreGranted) {
+
+            }*/
+        }
+    }*/
+
+    fun initialize() {
         locationRequest = LocationRequest.create()
             .apply { //https://stackoverflow.com/questions/66489605/is-constructor-locationrequest-deprecated-in-google-maps-v2
                 interval = 1000 //can be much higher
@@ -208,6 +283,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initialize()
+
         sharedPref = getSharedPreferences("JWT", Context.MODE_PRIVATE)
         if(checkLogin()) getProfile()
 
@@ -292,6 +369,28 @@ class MainActivity : AppCompatActivity() {
                 val twofa = result.component1()?.twofa ?: false
 
                 binding.textView4.text = "$email ($id) - 2FA: $twofa"
+            }
+        }
+    }
+
+    data class SensorSettings(var interval: Int, var fastestInterval: Int, var smallestDisplacement: Float, var priority: Int, var maxWaitTime: Int)
+
+    fun getSettings(update: Boolean = false) {
+        var interval = sharedPref.getString("interval", "")
+        var fastestInterval = sharedPref.getString("fastestInterval", "")
+        var smallestDisplacement = sharedPref.getString("smallestDisplacement", "")
+        var priority = sharedPref.getString("priority", "")
+        var maxWaitTime = sharedPref.getString("maxWaitTime", "")
+
+        val test = SensorSettings(interval = interval?.toIntOrNull() ?: 1000, fastestInterval = fastestInterval?.toIntOrNull() ?: 500, smallestDisplacement = smallestDisplacement?.toFloatOrNull() ?: 25f, priority = priority?.toIntOrNull() ?: Priority.PRIORITY_BALANCED_POWER_ACCURACY, maxWaitTime = maxWaitTime?.toIntOrNull() ?: 1000)
+
+        data class Setting(var _id: String, var value: String)
+        data class Settings(var settings: ArrayList<Setting>)
+
+        val url = getString(R.string.serverURL) + "/settings"
+        url.httpGet().responseObject<Settings> { request, response, result ->
+            if (response.statusCode == 200 ) {
+                val settings = result.component1()?.settings
             }
         }
     }

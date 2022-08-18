@@ -4,6 +4,7 @@ import { CallbackError, HydratedDocument } from "mongoose";
 import Drive, { IDrive } from "../models/driveModel";
 import RawRoadQuality from "../models/rawRoadQualityModel";
 import RoadQuality from "../models/roadQualityModel";
+import { calculateQuality } from "../utils/qualityCalculation";
 
 const {
   OK,
@@ -136,9 +137,45 @@ async function driveDelete(req: Request, res: Response) {
   return res.json(drive);
 }
 
+async function driveRecalculate(req: Request, res: Response) {
+  try {
+    await RoadQuality.deleteMany({});
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+
+  let quality;
+  try {
+    quality = await RawRoadQuality.find().exec();
+  } catch (err) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      msg: "Server error.",
+    });
+  }
+
+  quality.forEach(async (quality) => {
+    const roadQuality = new RoadQuality();
+    roadQuality.drive = quality.drive;
+    roadQuality.quality = calculateQuality(quality.measurements);
+    //roadQuality.createdAt = quality.createdAt;
+    //roadQuality.updatedAt = quality.updatedAt;
+    roadQuality.user = quality.user;
+    try {
+      await roadQuality.save();
+    } catch (err) {
+      return res.status(INTERNAL_SERVER_ERROR).json({
+        msg: "Server error.",
+      });
+    }
+  });
+}
+
 export default {
   driveGet,
   drivePost,
   drivePut,
   driveDelete,
+  driveRecalculate,
 } as const;

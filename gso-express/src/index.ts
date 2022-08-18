@@ -18,6 +18,7 @@ import rawRoadQualityRoutes from "./routes/rawRoadQualityRoutes";
 import roadQualityRoutes from "./routes/roadQualityRoutes";
 import roadWorksRoutes from "./routes/roadWorksRoutes";
 import userRoutes from "./routes/userRoutes";
+import settingsRoutes from "./routes/settingsRoutes";
 import { IUser } from "./models/userModel";
 import { expressjwt } from "express-jwt";
 
@@ -56,7 +57,9 @@ app.use(
 app.use(function (req: Request, res: Response, next: NextFunction) {
   if (req.headers.origin) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
+    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
     res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
   }
   next();
 });
@@ -127,6 +130,7 @@ app.use("/drives", driveRoutes);
 app.use("/rawRoadQuality", rawRoadQualityRoutes);
 app.use("/roadQuality", roadQualityRoutes);
 app.use("/roadWorks", roadWorksRoutes);
+app.use("/settings", settingsRoutes);
 
 const { NOT_FOUND } = StatusCodes;
 app.use(function (req: Request, res: Response) {
